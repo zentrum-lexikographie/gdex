@@ -1,20 +1,20 @@
-[![PyPI version](https://badge.fury.io/py/template_pypi.svg)](https://badge.fury.io/py/template_pypi)
-[![PyPi downloads](https://img.shields.io/pypi/dm/template_pypi)](https://img.shields.io/pypi/dm/template_pypi)
+[![PyPI version](https://badge.fury.io/py/quax.svg)](https://badge.fury.io/py/quax)
+[![PyPi downloads](https://img.shields.io/pypi/dm/quax)](https://img.shields.io/pypi/dm/quax)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4284804.svg)](https://doi.org/10.5281/zenodo.4284804)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/myorg/template_pypi/master?urlpath=lab)
-[![Gitpod - Code Now](https://img.shields.io/badge/Gitpod-code%20now-blue.svg?longCache=true)](https://gitpod.io#https://github.com/myorg/template_pypi)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/myorg/template_pypi.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/myorg/template_pypi/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/myorg/template_pypi.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/myorg/template_pypi/context:python)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/ulf1/quax/master?urlpath=lab)
+[![Gitpod - Code Now](https://img.shields.io/badge/Gitpod-code%20now-blue.svg?longCache=true)](https://gitpod.io#https://github.com/ulf1/quax)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/ulf1/quax.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ulf1/quax/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ulf1/quax.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ulf1/quax/context:python)
 
-# template_pypi
+# QUAX: QUAlity of sentence eXamples scoring
 
 ## DELETE THIS LATER 
-Download template_pypi and rename it
+Download quax and rename it
 
 ```
-git clone git@github.com:kmedian/template_pypi.git mycoolpkg
+git clone git@github.com:kmedian/quax.git mycoolpkg
 cd mycoolpkg
-bash rename.sh "myorg" "mycoolpkg" "Real Name"
+bash rename.sh "ulf1" "mycoolpkg" "Real Name"
 ```
 
 Reinitialize the repo:
@@ -22,7 +22,7 @@ Reinitialize the repo:
 ```
 rm -rf .git
 git init
-git remote add origin git@github.com:myorg/mycoolpkg.git
+git remote add origin git@github.com:ulf1/mycoolpkg.git
 ```
 
 
@@ -39,17 +39,17 @@ Table of Contents
 ## Appendix
 
 ### Installation
-The `template_pypi` [git repo](http://github.com/myorg/template_pypi) is available as [PyPi package](https://pypi.org/project/template_pypi)
+The `quax` [git repo](http://github.com/ulf1/quax) is available as [PyPi package](https://pypi.org/project/quax)
 
 ```sh
-pip install template_pypi
-pip install git+ssh://git@github.com/myorg/template_pypi.git
+pip install quax
+pip install git+ssh://git@github.com/ulf1/quax.git
 ```
 
 ### Install a virtual environment
 
 ```sh
-python3.6 -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt --no-cache-dir
@@ -84,8 +84,8 @@ rm -r .venv
 
 
 ### Support
-Please [open an issue](https://github.com/myorg/template_pypi/issues/new) for support.
+Please [open an issue](https://github.com/ulf1/quax/issues/new) for support.
 
 
 ### Contributing
-Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/myorg/template_pypi/compare/).
+Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/ulf1/quax/compare/).

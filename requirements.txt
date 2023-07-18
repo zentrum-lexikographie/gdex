@@ -6,3 +6,8 @@
 
 # private packages
 # -e git://github.com:ulf1/mycoolpkg.git#egg=mycoolpkg
+
+conllu>=4.5.3
+spacy>=3.6
+spacy_conll>=3.4
+
