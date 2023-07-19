@@ -1,12 +1,14 @@
 import unittest
 
-from quax.quax import is_whole_sentence, is_misparsed, has_illegal_chars, has_blacklist_words
+from quax.quax import is_whole_sentence, is_misparsed, has_illegal_chars, has_blacklist_words, \
+factor_graylist_rarechars, factor_graylist_nongermankeyboardchars, factor_graylist_words, \
+greylist_ne, ortsdeixis, zeitdeixis, personendeixis, optimal_interval
 
 class QuaxTester(unittest.TestCase):
     def setUp(self):
         # EXAMPLE 1
-        sent1 = 'Ich hatte Gelegenheit eines seiner Seminare zu besuchen.',
-        tree1 = [{'text': 'Ich',
+        self.sent1 = 'Ich hatte Gelegenheit eines seiner Seminare zu besuchen.',
+        self.tree1 = [{'text': 'Ich',
                 'lemma': 'ich',
                 'pos': 'PRON',
                 'tag': 'PPER',
@@ -69,8 +71,8 @@ class QuaxTester(unittest.TestCase):
                 'head': 'hatte',
                 'dep': 'punct',
                 'children': []}]
-        lemma1 = 'haben'
-        tokens1 = ['Ich',
+        self.lemma1 = 'haben'
+        self.tokens1 = ['Ich',
                     'hatte',
                     'Gelegenheit',
                     'eines',
@@ -79,7 +81,7 @@ class QuaxTester(unittest.TestCase):
                     'zu',
                     'besuchen',
                     '.']
-        lemmata1 = ['ich',
+        self.lemmata1 = ['ich',
                     'haben',
                     'Gelegenheit',
                     'ein',
@@ -88,8 +90,8 @@ class QuaxTester(unittest.TestCase):
                     'zu',
                     'besuchen',
                     '.']
-        upos1 = ['PRON', 'VERB', 'NOUN', 'DET', 'DET', 'NOUN', 'PART', 'VERB', 'PUNCT']
-        xpos1 = ['PPER', 'VAFIN', 'NN', 'PIS', 'PPOSAT', 'NN', 'PTKZU', 'VVINF', '$.']
+        self.upos1 = ['PRON', 'VERB', 'NOUN', 'DET', 'DET', 'NOUN', 'PART', 'VERB', 'PUNCT']
+        self.xpos1 = ['PPER', 'VAFIN', 'NN', 'PIS', 'PPOSAT', 'NN', 'PTKZU', 'VVINF', '$.']
 
 
     def test_is_whole_sentence(self):
@@ -135,3 +137,56 @@ class QuaxTester(unittest.TestCase):
         result3 = has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Idiot',
             ['und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
         self.assertTrue(result3)
+
+    def test_factor_graylist_rarechars(self):
+        result1 = factor_graylist_rarechars(self.sent1)
+        self.assertGreater(result1, 0.5)
+        result2 = factor_graylist_rarechars("''..??")
+        self.assertGreater(0.5, result2)
+
+    def test_factor_graylist_nongermankeyboardchars(self):
+        result1 = factor_graylist_nongermankeyboardchars(self.sent1)
+        self.assertEqual(result1, 1.)
+        result2 = factor_graylist_nongermankeyboardchars('ßÄÖÜäöü')
+        self.assertEqual(result2, 1.)
+        result3 = factor_graylist_nongermankeyboardchars('À la carte, s\'il vous plaît\n')
+        self.assertLess(result3, 1.)
+
+    def test_factor_graylist_words(self):
+        result1 = factor_graylist_words(self.sent1, self.xpos1)
+        self.assertLess(result1, 1.)
+        result2 = factor_graylist_words('Kein Problem.', ['PIAT', 'NN'])
+        self.assertEqual(result2, 1.)
+
+    def test_greylist_ne(self):
+        result1 = greylist_ne(self.sent1, self.upos1, self.xpos1)
+        self.assertEqual(result1, 1.)
+        result2 = greylist_ne('Manasse ist ein einzigartiger Parfümeur.',
+                              ['PROPN', 'AUX', 'DET', 'ADJ', 'NOUN', 'PUNCT'],
+                              ['NE', 'VAFIN', 'ART', 'ADJA', 'NN', '$.'])
+        self.assertLess(result2, 1.)
+
+    def test_deixis(self):
+        result1 = [ortsdeixis(self.sent1, self.lemma1, self.lemmata1),
+                   zeitdeixis(self.sent1, self.lemma1, self.lemmata1),
+                   personendeixis(self.sent1, self.lemma1, self.lemmata1)]
+        self.assertEqual(result1, [0, 0, 0])
+        sent2, lemmata2 = "Heute hier, morgen dort.", ['heute', 'hier', '--', 'morgen', 'dort', '--']
+        result2 = [ortsdeixis(sent2, 'heute', lemmata2),
+                   zeitdeixis(sent2, 'heute', lemmata2),
+                   personendeixis(sent2, 'heute', lemmata2)]
+        self.assertEqual(result2, [2, 1, 0])
+        result3 = [ortsdeixis(sent2, 'hier', lemmata2),
+                   zeitdeixis(sent2, 'hier', lemmata2),
+                   personendeixis(sent2, 'hier', lemmata2)]
+        self.assertEqual(result3, [1, 2, 0])
+
+    def test_optimal_interval(self):
+        result1 = optimal_interval(self.tokens)
+        self.assertLess(result1, 1.)
+        result2 = optimal_interval('Das ist ein Beispielsatz mit optimaler Länge von über 10 Tokens.')
+        self.assertEqual(result2, 1.)
+        result3 = optimal_interval('Viel zu kurz.')
+        self.assertEqual(result3, 0.)
+        result4 = optimal_interval('Dieser hingegen ist leider zu lang. Das macht ihn weniger angenehm zu lesen. Daher ist der zurückgegebene Wert kleiner als 1, schade.')
+        self.assertLess(result4, 1.)

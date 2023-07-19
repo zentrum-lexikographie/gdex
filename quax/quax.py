@@ -154,10 +154,11 @@ def factor_graylist_words(txt: str,
 
 
 def greylist_ne(txt: str,
+             upos: List[str],
              xpos: List[str],
-             greylist_pos: List[str] = ['NE'],
+             greylist_pos: List[str] = ['NE', 'PROPN'],
              penalty_factor: float = 0.1):
-    num_matches = len([p for p in xpos if p in greylist_pos])
+    num_matches = len([_ for u, x in zip(upos, xpos) if (u in greylist_pos or x in greylist_pos)])
     return max(0.0, 1.0 - penalty_factor * num_matches)
 
 
