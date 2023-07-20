@@ -1,10 +1,8 @@
-import random
 from typing import List
 
-import conllu
-from spacy_conll import init_parser
 
-random.seed(42)
+
+
 
 def total_score(**kwargs) -> float:
     """ Rule-based sentence scoring formula
@@ -14,11 +12,11 @@ def total_score(**kwargs) -> float:
     **kwargs : Dict (named input arguments)
         txt=sent,
         dependency_tree=tree,
-        lemma=lemma,
-        lemmata=lemmata,
+        headword=headword,
+        lemmas=lemmas,
         xpos=xpos,
         tokens=tokens
-        (what we need so far: tokens, lemmata, dependency information, STTS and
+        (what we need so far: tokens, lemmas, dependency information, STTS and
         UPOS tags)
         The called subfunctions will throw an error if something is missing
 
@@ -26,48 +24,68 @@ def total_score(**kwargs) -> float:
     --------
     float
         Score if a sentence example is suitable as dictionary example.
-
-
     """
-    return .5 * factor_knockout_criteria(**kwargs) \
+    return .5 * isa_knockout_criteria(**kwargs) \
          + .5 * factor_gradual_criteria(**kwargs)
 
-def factor_knockout_criteria(**kwargs):
+
+def isa_knockout_criteria(**kwargs):
+    # read input arguments
     dependency_tree = kwargs.get('dependency_tree')
     txt = kwargs.get('txt')
+    headword = kwargs.get('headword')
+    lemmas = kwargs.get('lemmas')
+    # compute factor
     return is_whole_sentence(txt, dependency_tree) \
          * is_misparsed(txt) \
          * has_illegal_chars(txt) \
-         * has_blacklist_words(txt, lemma, lemmata)
+         * has_blacklist_words(txt, headword, lemmas)
 
 
 def factor_gradual_criteria(**kwargs):
+    # read input arguments
     txt = kwargs.get('txt')
+    headword = kwargs.get('headword')
+    lemmas = kwargs.get('lemmas')
+    xpos = kwargs.get('xpos')
+    tokens = kwargs.get('tokens')
+    # compute factor
     return factor_graylist_rarechars(txt) \
          * factor_graylist_nongermankeyboardchars(txt) \
          * factor_graylist_words(txt, xpos) \
          * greylist_ne(txt, xpos) \
-         * (ortsdeixis(txt, lemma, lemmata)
-         + zeitdeixis(txt, lemma, lemmata)
-         + personendeixis(txt, lemma, lemmata, xpos)) / 3. \
+         * (
+            deixis_space(txt, headword, lemmas)
+            + deixis_time(txt, headword, lemmas)
+            + deixis_person(txt, headword, lemmas, xpos)
+           ) / 3. \
          * optimal_interval(tokens)
 
 
-def is_whole_sentence(txt: str, dependency_tree: List[dict]):
+def is_whole_sentence(txt: str,
+                      dependency_tree: List[dict]) -> bool:
+    """Checks if the sentence is a whole sentence.
+
+    It is a knockout criterion.
+    """
+    # find the root of the dependency tree
     root = [token for token in dependency_tree if token['dep'].lower() == 'root']
     assert len(root) == 1
     root = root[0]
+    
     # finite verb is root and subject is one of its children
     verb_root = False
     if root['pos'] in {'AUX', 'VERB'} and root['tag'].endswith('FIN'):
         verb_root = True
     subj_child_of_verb = False
+    
     for child in root['children']:
         child_dict = [c for c in dependency_tree if c['text'] == child][0]
         if child_dict['pos'] in {'NOUN', 'PROPN', 'PRON'}:
             # subj for conll, sb for spacy
             if 'subj' in child_dict['dep'] or 'sb' in child_dict['dep']:
                 subj_child_of_verb = True
+    
     return (verb_root and subj_child_of_verb)
 
 
@@ -105,8 +123,8 @@ blacklist_words = ['negroid',
  'Negerkind',
  'Negerstamm']
 
-def has_blacklist_words(txt: str, lemma: str, lemmata: List[str]):
-    return any([l.lower() in blacklist_words and l != lemma for l in lemmata])
+def has_blacklist_words(txt: str, headword: str, lemmas: List[str]):
+    return any([l.lower() in blacklist_words and l != headword for l in lemmas])
 
 
 def factor_graylist_rarechars(txt: str,
@@ -166,18 +184,18 @@ tempdeixis = ['jetzt', 'heute', 'gestern', 'morgen', 'dann', 'damals', 'bald', '
 localdeixis = ['hier', 'dort', 'über', 'da', 'vor', 'hinter', 'links', 'von', 'rechts',
   'von', 'oben', 'unten']
 
-def deixis(txt: str, lemma: str, lemmata: List[str], deixis_terms: List[str]):
-  return len([l for l in lemmata if l != lemma and l in deixis_terms])
+def deixis(txt: str, headword: str, lemmas: List[str], deixis_terms: List[str]):
+  return len([l for l in lemmas if l != headword and l in deixis_terms])
 
-def ortsdeixis(txt: str, lemma: str, lemmata: List[str]):
-    return deixis(txt, lemma, lemmata, localdeixis)
+def deixis_space(txt: str, headword: str, lemmas: List[str]):
+    return deixis(txt, headword, lemmas, localdeixis)
 
-def zeitdeixis(txt: str, lemma: str, lemmata: List[str]):
-    return deixis(txt, lemma, lemmata, tempdeixis)
+def deixis_time(txt: str, headword: str, lemmas: List[str]):
+    return deixis(txt, headword, lemmas, tempdeixis)
 
-def personendeixis(txt:str, lemma: str, lemmata: List[str], xpos: List[str]):
+def deixis_person(txt:str, headword: str, lemmas: List[str], xpos: List[str]):
     return len([p for i, p in enumerate(xpos) if p == 'PPER'
-    and not lemmata[i] == lemma])
+    and not lemmas[i] == headword])
 
 
 def optimal_interval(txt: str, low: int=10, high: int=20):

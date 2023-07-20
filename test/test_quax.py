@@ -1,8 +1,9 @@
 import unittest
 
-from quax.quax import is_whole_sentence, is_misparsed, has_illegal_chars, has_blacklist_words, \
-factor_graylist_rarechars, factor_graylist_nongermankeyboardchars, factor_graylist_words, \
-greylist_ne, ortsdeixis, zeitdeixis, personendeixis, optimal_interval
+import quax
+from quax.quax import quax.is_whole_sentence, quax.is_misparsed, quax.has_illegal_chars, quax.has_blacklist_words, \
+quax.factor_graylist_rarechars, quax.factor_graylist_nongermankeyboardchars, quax.factor_graylist_words, \
+quax.greylist_ne, quax.deixis_space, quax.deixis_time, quax.deixis_person, quax.optimal_interval
 
 class QuaxTester(unittest.TestCase):
     def setUp(self):
@@ -95,7 +96,7 @@ class QuaxTester(unittest.TestCase):
 
 
     def test_is_whole_sentence(self):
-        result1 = is_whole_sentence(self.sent1, self.tree1)
+        result1 = quax.is_whole_sentence(self.sent1, self.tree1)
         self.assertTrue(result1)
         txt = 'Keine Ahnung, was das soll.'
         baum = [
@@ -107,86 +108,86 @@ class QuaxTester(unittest.TestCase):
             {'text': 'soll', 'lemma': 'sollen', 'pos': 'AUX', 'tag': 'VMFIN', 'dep': 'rc', 'head': 'Ahnung', 'children': ['was', 'das']},
             {'text': '.', 'lemma': '--', 'pos': 'PUNCT', 'tag': '$.', 'dep': 'punct', 'head': 'Ahnung', 'children': []}
             ]
-        result2 = is_whole_sentence(txt, baum)
+        result2 = quax.is_whole_sentence(txt, baum)
         self.assertFalse(result2)
 
     def test_is_misparsed(self):
-        result1 = is_misparsed(self.sent1)
+        result1 = quax.is_misparsed(self.sent1)
         self.assertFalse(result1)
-        result2 = is_misparsed('Das ist ein Beispieltext')
+        result2 = quax.is_misparsed('Das ist ein Beispieltext')
         self.assertTrue(result2)
-        result3 = is_misparsed('das ist ein Beispieltext.')
+        result3 = quax.is_misparsed('das ist ein Beispieltext.')
         self.assertTrue(result3)
-        result4 = is_misparsed('\tDas ist ein Beispieltext.')
+        result4 = quax.is_misparsed('\tDas ist ein Beispieltext.')
         self.assertTrue(result4)
 
     def test_has_illegal_chars(self):
-        result1 = has_illegal_chars(self.sent1)
+        result1 = quax.has_illegal_chars(self.sent1)
         self.assertFalse(result1)
-        result2 = has_illegal_chars('https://somerandomurl.com')
+        result2 = quax.has_illegal_chars('https://somerandomurl.com')
         self.assertTrue(result2)
-        result3 = has_illegal_chars('name@mail.com')
+        result3 = quax.has_illegal_chars('name@mail.com')
         self.assertTrue(result3)
 
     def test_has_blacklist_words(self):
-        result1 = has_blacklist_words(self.sent1, self.lemma1, self.lemmata1)
+        result1 = quax.has_blacklist_words(self.sent1, self.lemma1, self.lemmata1)
         self.assertFalse(result1)
-        result2 = has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Beispielsatz',
+        result2 = quax.has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Beispielsatz',
             ['und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
         self.assertTrue(result2)
-        result3 = has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Idiot',
+        result3 = quax.has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Idiot',
             ['und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
         self.assertTrue(result3)
 
     def test_factor_graylist_rarechars(self):
-        result1 = factor_graylist_rarechars(self.sent1)
+        result1 = quax.factor_graylist_rarechars(self.sent1)
         self.assertGreater(result1, 0.5)
-        result2 = factor_graylist_rarechars("''..??")
+        result2 = quax.factor_graylist_rarechars("''..??")
         self.assertGreater(0.5, result2)
 
     def test_factor_graylist_nongermankeyboardchars(self):
-        result1 = factor_graylist_nongermankeyboardchars(self.sent1)
+        result1 = quax.factor_graylist_nongermankeyboardchars(self.sent1)
         self.assertEqual(result1, 1.)
-        result2 = factor_graylist_nongermankeyboardchars('ßÄÖÜäöü')
+        result2 = quax.factor_graylist_nongermankeyboardchars('ßÄÖÜäöü')
         self.assertEqual(result2, 1.)
-        result3 = factor_graylist_nongermankeyboardchars('À la carte, s\'il vous plaît\n')
+        result3 = quax.factor_graylist_nongermankeyboardchars('À la carte, s\'il vous plaît\n')
         self.assertLess(result3, 1.)
 
     def test_factor_graylist_words(self):
-        result1 = factor_graylist_words(self.sent1, self.xpos1)
+        result1 = quax.factor_graylist_words(self.sent1, self.xpos1)
         self.assertLess(result1, 1.)
-        result2 = factor_graylist_words('Kein Problem.', ['PIAT', 'NN'])
+        result2 = quax.factor_graylist_words('Kein Problem.', ['PIAT', 'NN'])
         self.assertEqual(result2, 1.)
 
     def test_greylist_ne(self):
-        result1 = greylist_ne(self.sent1, self.upos1, self.xpos1)
+        result1 = quax.greylist_ne(self.sent1, self.upos1, self.xpos1)
         self.assertEqual(result1, 1.)
-        result2 = greylist_ne('Manasse ist ein einzigartiger Parfümeur.',
+        result2 = quax.greylist_ne('Manasse ist ein einzigartiger Parfümeur.',
                               ['PROPN', 'AUX', 'DET', 'ADJ', 'NOUN', 'PUNCT'],
                               ['NE', 'VAFIN', 'ART', 'ADJA', 'NN', '$.'])
         self.assertLess(result2, 1.)
 
     def test_deixis(self):
-        result1 = [ortsdeixis(self.sent1, self.lemma1, self.lemmata1),
-                   zeitdeixis(self.sent1, self.lemma1, self.lemmata1),
-                   personendeixis(self.sent1, self.lemma1, self.lemmata1)]
+        result1 = [quax.deixis_space(self.sent1, self.lemma1, self.lemmata1),
+                   quax.deixis_time(self.sent1, self.lemma1, self.lemmata1),
+                   quax.deixis_person(self.sent1, self.lemma1, self.lemmata1)]
         self.assertEqual(result1, [0, 0, 0])
         sent2, lemmata2 = "Heute hier, morgen dort.", ['heute', 'hier', '--', 'morgen', 'dort', '--']
-        result2 = [ortsdeixis(sent2, 'heute', lemmata2),
-                   zeitdeixis(sent2, 'heute', lemmata2),
-                   personendeixis(sent2, 'heute', lemmata2)]
+        result2 = [quax.deixis_space(sent2, 'heute', lemmata2),
+                   quax.deixis_time(sent2, 'heute', lemmata2),
+                   quax.deixis_person(sent2, 'heute', lemmata2)]
         self.assertEqual(result2, [2, 1, 0])
-        result3 = [ortsdeixis(sent2, 'hier', lemmata2),
-                   zeitdeixis(sent2, 'hier', lemmata2),
-                   personendeixis(sent2, 'hier', lemmata2)]
+        result3 = [quax.deixis_space(sent2, 'hier', lemmata2),
+                   quax.deixis_time(sent2, 'hier', lemmata2),
+                   quax.deixis_person(sent2, 'hier', lemmata2)]
         self.assertEqual(result3, [1, 2, 0])
 
     def test_optimal_interval(self):
-        result1 = optimal_interval(self.tokens)
+        result1 = quax.optimal_interval(self.tokens)
         self.assertLess(result1, 1.)
-        result2 = optimal_interval('Das ist ein Beispielsatz mit optimaler Länge von über 10 Tokens.')
+        result2 = quax.optimal_interval('Das ist ein Beispielsatz mit optimaler Länge von über 10 Tokens.')
         self.assertEqual(result2, 1.)
-        result3 = optimal_interval('Viel zu kurz.')
+        result3 = quax.optimal_interval('Viel zu kurz.')
         self.assertEqual(result3, 0.)
-        result4 = optimal_interval('Dieser hingegen ist leider zu lang. Das macht ihn weniger angenehm zu lesen. Daher ist der zurückgegebene Wert kleiner als 1, schade.')
+        result4 = quax.optimal_interval('Dieser hingegen ist leider zu lang. Das macht ihn weniger angenehm zu lesen. Daher ist der zurückgegebene Wert kleiner als 1, schade.')
         self.assertLess(result4, 1.)
