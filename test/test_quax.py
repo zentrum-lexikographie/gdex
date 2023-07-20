@@ -1,9 +1,6 @@
 import unittest
-
 import quax
-from quax.quax import quax.is_whole_sentence, quax.is_misparsed, quax.has_illegal_chars, quax.has_blacklist_words, \
-quax.factor_graylist_rarechars, quax.factor_graylist_nongermankeyboardchars, quax.factor_graylist_words, \
-quax.greylist_ne, quax.deixis_space, quax.deixis_time, quax.deixis_person, quax.optimal_interval
+
 
 class QuaxTester(unittest.TestCase):
     def setUp(self):
