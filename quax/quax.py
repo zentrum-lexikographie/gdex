@@ -1,9 +1,6 @@
 from typing import List
 
 
-
-
-
 def total_score(**kwargs) -> float:
     """ Rule-based sentence scoring formula
 
@@ -31,12 +28,12 @@ def total_score(**kwargs) -> float:
 
 def isa_knockout_criteria(**kwargs):
     # read input arguments
-    dependency_tree = kwargs.get('dependency_tree')
     txt = kwargs.get('txt')
     headword = kwargs.get('headword')
-    lemmas = kwargs.get('lemmas')
+    dependency_tree = kwargs.get('dependency_tree')
+    lemmas = [t.get('lemma') for t in dependency_tree]
     # compute factor
-    return is_whole_sentence(txt, dependency_tree) \
+    return has_finite_verb_and_subject(dependency_tree) \
          * is_misparsed(txt) \
          * has_illegal_chars(txt) \
          * has_blacklist_words(txt, headword, lemmas)
@@ -46,9 +43,9 @@ def factor_gradual_criteria(**kwargs):
     # read input arguments
     txt = kwargs.get('txt')
     headword = kwargs.get('headword')
-    lemmas = kwargs.get('lemmas')
-    xpos = kwargs.get('xpos')
-    tokens = kwargs.get('tokens')
+    dependency_tree = kwargs.get('dependency_tree')
+    lemmas = [t.get('lemma') for t in dependency_tree]
+    num_tokens = len(dependency_tree)
     # compute factor
     return factor_graylist_rarechars(txt) \
          * factor_graylist_nongermankeyboardchars(txt) \
@@ -57,33 +54,33 @@ def factor_gradual_criteria(**kwargs):
          * (
             deixis_space(txt, headword, lemmas)
             + deixis_time(txt, headword, lemmas)
-            + deixis_person(txt, headword, lemmas, xpos)
+            + deixis_person(txt, headword, dependency_tree)
            ) / 3. \
-         * optimal_interval(tokens)
+         * optimal_interval(num_tokens)
 
 
-def is_whole_sentence(txt: str,
-                      dependency_tree: List[dict]) -> bool:
-    """Checks if the sentence is a whole sentence.
+def has_finite_verb_and_subject(dependency_tree: List[dict]) -> bool:
+    """Has finite verb as root and subject as one of its children.
 
     It is a knockout criterion.
     """
     # find the root of the dependency tree
-    root = [token for token in dependency_tree if token['dep'].lower() == 'root']
+    root = [token for token in dependency_tree if token['deprel'].lower() == 'root']
     assert len(root) == 1
     root = root[0]
     
-    # finite verb is root and subject is one of its children
+    # finite verb is root
     verb_root = False
-    if root['pos'] in {'AUX', 'VERB'} and root['tag'].endswith('FIN'):
-        verb_root = True
+    if root['upos'] in {'AUX', 'VERB'}:
+        if root['feats'].get('VerbForm', '') == 'Fin':
+            verb_root = True
+
+    # subject is one of its children
     subj_child_of_verb = False
-    
     for child in root['children']:
         child_dict = [c for c in dependency_tree if c['text'] == child][0]
-        if child_dict['pos'] in {'NOUN', 'PROPN', 'PRON'}:
-            # subj for conll, sb for spacy
-            if 'subj' in child_dict['dep'] or 'sb' in child_dict['dep']:
+        if child_dict['upos'] in {'NOUN', 'PROPN', 'PRON'}:
+            if 'subj' in child_dict['deprel']:
                 subj_child_of_verb = True
     
     return (verb_root and subj_child_of_verb)
@@ -180,40 +177,76 @@ def greylist_ne(txt: str,
     return max(0.0, 1.0 - penalty_factor * num_matches)
 
 
-tempdeixis = ['jetzt', 'heute', 'gestern', 'morgen', 'dann', 'damals', 'bald', 'kürzlich']
-localdeixis = ['hier', 'dort', 'über', 'da', 'vor', 'hinter', 'links', 'von', 'rechts',
-  'von', 'oben', 'unten']
+DEFAULT_TIME_DEIXIS_TERMS = [
+    'jetzt', 'heute', 'gestern', 'morgen', 'dann', 'damals', 'bald',
+    'kürzlich']
 
-def deixis(txt: str, headword: str, lemmas: List[str], deixis_terms: List[str]):
-  return len([l for l in lemmas if l != headword and l in deixis_terms])
-
-def deixis_space(txt: str, headword: str, lemmas: List[str]):
-    return deixis(txt, headword, lemmas, localdeixis)
-
-def deixis_time(txt: str, headword: str, lemmas: List[str]):
-    return deixis(txt, headword, lemmas, tempdeixis)
-
-def deixis_person(txt:str, headword: str, lemmas: List[str], xpos: List[str]):
-    return len([p for i, p in enumerate(xpos) if p == 'PPER'
-    and not lemmas[i] == headword])
+DEFAULT_SPACE_DEIXIS_TERMS = [
+    'hier', 'dort', 'über', 'da', 'vor', 'hinter', 'links', 'von', 'rechts',
+    'von', 'oben', 'unten']
 
 
-def optimal_interval(txt: str, low: int=10, high: int=20):
-    if isinstance(txt, (list, tuple)):
-        tokens = txt
-    else:
-        tokens = txt.split()
-    if low <= len(tokens) <= high:
+def _deixis(headword: str, 
+            lemmas: List[str], 
+            deixis_terms: List[str],
+            penalty_factor: float = 0.1):
+    """Deixis factor"""
+    cnt = len([l for l in lemmas if l != headword and l in deixis_terms])
+    return max(0.0, 1.0 - penalty_factor * cnt)
+
+
+def deixis_space(headword: str, 
+                 lemmas: List[str],
+                 space_deixis_terms: List[str] = DEFAULT_SPACE_DEIXIS_TERMS,
+                 penalty_factor: float = 0.1) -> float:
+    """Space deixis factor"""
+    return _deixis(headword=headword, 
+                   lemmas=lemmas, 
+                   deixis_terms=space_deixis_terms,
+                   penalty_factor=penalty_factor)
+
+
+def deixis_time(headword: str, 
+                lemmas: List[str],
+                time_deixis_terms: List[str] = DEFAULT_TIME_DEIXIS_TERMS,
+                penalty_factor: float = 0.1) -> float:
+    """Time deixis factor"""
+    return _deixis(headword=headword, 
+                   lemmas=lemmas, 
+                   deixis_terms=time_deixis_terms,
+                   penalty_factor=penalty_factor)
+
+
+def deixis_person(headword: str, 
+                  dependency_tree: List[dict],
+                  penalty_factor: float = 0.1) -> float:
+    """Count personal deixis
+
+    We use UD's PronType=Prs as criteron. It includes personal pronouns,
+    but also possessive personal pronoun, e.g. "seiner"
+    
+    see https://universaldependencies.org/en/feat/PronType.html
+    """
+    cnt = len([
+        t for t in dependency_tree 
+        if t.get('feats', {}).get('PronType', '') == 'Prs'
+        and t['lemma'] != headword])
+    return max(0.0, 1.0 - penalty_factor * cnt)
+
+
+def optimal_interval(num_tokens: int, low: int=10, high: int=20):
+    """Optimal sentence length by the number of word tokens"""
+    if low <= num_tokens <= high:
         return 1.
-    elif len(tokens) < low:
-        if len(tokens) < low/2:
+    elif num_tokens < low:
+        if num_tokens < low / 2.:
             return 0.
         else:
-            diff = low - len(tokens)
-            return 1 - diff * (1 / (low/2))
+            diff = low - num_tokens
+            return 1 - diff * (1. / (low / 2.))
     else:
-        if len(tokens) > (2*high):
+        if num_tokens > (2 * high):
             return 0.
-        diff = (2*high) - len(tokens)
+        diff = (2 * high) - num_tokens
         return diff / high
 

@@ -5,7 +5,7 @@ random.seed(42)
 
 
 def parse_conllu(corpus: List[conllu.models.TokenList]) -> List[dict]:
-    """
+    """Convert conllu reader output to a list of dictionaries.
 
     Usage:
     ------
@@ -24,16 +24,19 @@ def parse_conllu(corpus: List[conllu.models.TokenList]) -> List[dict]:
         s = []
         for tok in sent:
             d = {
+                "id": tok['id'],
                 'text': tok['form'], 
                 'lemma': tok['lemma'],
-                'pos': tok['upos'], 
-                'tag': tok['xpos'],
+                'upos': tok['upos'], 
+                'feats': tok['feats'],
                 'head': '', 
-                'dep': tok['deprel']
+                'deprel': tok['deprel']
             }
+            # read lemmas that are children of token
             if tok['head']:  # can be none in multi-line
                 if sent[int(tok['head'])] != '0':
                     d['head'] = sent[int(tok['head'])-1]['form']
+
             s.append(d)
 
         # determine children
