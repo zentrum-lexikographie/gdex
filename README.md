@@ -2,17 +2,26 @@
 [![PyPi downloads](https://img.shields.io/pypi/dm/quax)](https://img.shields.io/pypi/dm/quax)
 
 # QUAX: QUAlity of sentence eXamples scoring
+Rule-based sentence scoring algorithm based on GDEX.
 
 
-
-## Usage
-
-Table of Contents
-
-* [Use Case 1](#use-case-1)
+## Rules
 
 
-### Use Case 1
+| Funktion | Ausgabe | Beschreibung | Hinweis |
+|:---:|:---:|:---|:---|
+| `factor_named_entity` | [1.0 - penalty, 1.0] | Strafe Satzbeleg ab, wenn Lemma ein o. Teil eines Eigennamen ist | [1] GDEX upper case (rare chars), [2] GBEX NE |
+| `deixis_time` | [0.0, 1.0] | Strafe Signalwörter für Temporaldeixis ab. | [2] GBEX Dexis; [3] |
+| `deixis_space` | [0.0, 1.0] | Strafe Signalwörter für Lokaldeixis ab. | [2] GBEX Dexis; [3] |
+| `deixis_person` | [0.0, 1.0] | Strafe Wörter mit `UPOS=PRON` und `PronType=Prs|Dem|Ind|Neg|Tot` ab. Entspricht STTS PoS-Tags `PDS` (`PRON` + `Dem`, z.B, das, dies, die, diese, der), `PIS` (`PRON` + `Ind|Neg|Tot`, z.B, man, allem, nichts, alles, mehr), `PPER` (`PRON` + `Prs`, z.B, es, sie, er, wir, ich), `PPOSS` (`PRON` + `Prs`, z.B, ihren, Seinen, seinem, unsrigen, meiner). | [1] GDEX graylist PoS- Tags, [2] GBEX Dexis; [3], [4] |
+| `optimal_interval` | [0.0, 1.0] | Strafe Satzbelege mit zu wenigen/vielen Wörter ab ab. | [1] GDEX |
+
+
+Quellen:
+- [1] Lexical Computing, "GDEX configuration introduction", URL: https://www.sketchengine.eu/syntax-of-gdex-configuration-files/
+- [2] Didakowski, Lemnitzer, Geyken, 2012, "Automatic example sentence ex- traction for a contemporary German dictionary", URL: https://euralex.org/publications/automatic-example-sentence-extraction-for-a-contemporary-german-dictionary/
+- [3] LingTermNet, URL: https://gsw.phil-fak.uni-duesseldorf.de/diskurslinguistik/index.php?title=Deiktischer_Ausdruck
+- [4] Universial Dependency, UPOS-STTS conversion table, URL: https://universaldependencies.org/tagset-conversion/de-stts-uposf.html
 
 
 ## Appendix
