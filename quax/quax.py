@@ -10,27 +10,24 @@ def total_score(**kwargs) -> float:
         txt=sent,
         annotation=tree,
         headword=headword,
-        lemmas=lemmas,
-        xpos=xpos,
-        tokens=tokens
-        (what we need so far: tokens, lemmas, dependency information, STTS and
-        UPOS tags)
-        The called subfunctions will throw an error if something is missing
+        [others ...]
 
     Returns:
     --------
     float
         Score if a sentence example is suitable as dictionary example.
     """
-    return .5 * isa_knockout_criteria(**kwargs) \
-         + .5 * factor_gradual_criteria(**kwargs)
+    score = .5 * isa_knockout_criteria(**kwargs)
+    score += .5 * factor_gradual_criteria(**kwargs)
+    return score
 
 
 def isa_knockout_criteria(**kwargs):
     # read input arguments
-    txt = kwargs.get('txt')
     headword = kwargs.get('headword')
+    txt = kwargs.get('txt')
     annotation = kwargs.get('annotation')
+    # prepare variables
     lemmas = [t.get('lemma') for t in annotation]
     # compute factor
     if not has_finite_verb_and_subject(annotation):
@@ -46,23 +43,50 @@ def isa_knockout_criteria(**kwargs):
 
 def factor_gradual_criteria(**kwargs):
     # read input arguments
-    txt = kwargs.get('txt')
     headword = kwargs.get('headword')
+    txt = kwargs.get('txt')
     annotation = kwargs.get('annotation')
+    graylist = kwargs.get('graylist', [])  # optional
+    # prepare variables
     lemmas = [t.get('lemma') for t in annotation]
     num_tokens = len(annotation)
-    graylist = kwargs.get('graylist', [])
+    # penalties
+    penalty_rarechars = kwargs.get('penalty_rarechars', 0.125)
+    penalty_notkeyboardchar = kwargs.get('penalty_notkeyboardchar', True)
+    penalty_graylist_words = kwargs.get('penalty_graylist_words', 0.075)
+    penalty_named_entity = kwargs.get('penalty_named_entity', 0.1667)
+    penalty_interval = kwargs.get('penalty_interval', True)
+    optimal_interval_low = kwargs.get('optimal_interval_low', 10)
+    optimal_interval_high = kwargs.get('optimal_interval_high', 20)
+    penalty_space_deixis = kwargs.get('penalty_space_deixis', 0.034)
+    penalty_time_deixis = kwargs.get('penalty_time_deixis', 0.034)
+    penalty_person_deixis = kwargs.get('penalty_person_deixis', 0.034)
     # compute factor
-    return factor_rarechars(txt, penalty_factor=0.1) \
-         * factor_notkeyboardchar(txt) \
-         * factor_graylist_words(headword, lemmas, graylist, 0.1) \
-         * factor_named_entity(headword, annotation, 0.15) \
-         * (
-            deixis_space(headword, lemmas, 0.1)
-            + deixis_time(headword, lemmas, 0.1)
-            + deixis_person(headword, annotation, 0.1)
-           ) / 3. \
-         * optimal_interval(num_tokens, 10, 20)
+    factor = 1.0
+    if penalty_rarechars >= 0.0:
+        factor *= factor_rarechars(txt, penalty_factor=penalty_rarechars)
+    if penalty_notkeyboardchar:
+        factor *= factor_notkeyboardchar(txt)
+    if penalty_graylist_words >= 0.0:
+        factor *= factor_graylist_words(
+            headword, lemmas, graylist, penalty_factor=penalty_graylist_words)
+    if penalty_named_entity >= 0.0:
+        factor *= factor_named_entity(
+            headword, annotation, penalty_factor=penalty_named_entity)
+    if penalty_interval:
+        factor *= optimal_interval(
+            num_tokens, low=optimal_interval_low, high=optimal_interval_high)
+    if penalty_space_deixis >= 0.0:
+        factor *= deixis_space(
+            headword, lemmas, penalty_factor=penalty_space_deixis)
+    if penalty_time_deixis >= 0.0:
+        factor *= deixis_time(
+            headword, lemmas, penalty_factor=penalty_time_deixis)
+    if penalty_person_deixis >= 0.0:
+        factor *= deixis_person(
+            headword, annotation, penalty_factor=penalty_person_deixis)
+    # done
+    return factor
 
 
 def has_finite_verb_and_subject(annotation: List[dict]) -> bool:
@@ -75,7 +99,7 @@ def has_finite_verb_and_subject(annotation: List[dict]) -> bool:
     assert len(root) == 1
     root = root[0]
     root_id = root['id']
-    
+
     # find finite verb
     def is_finite_verb(tok):
         if tok.get('upos', '') in {'AUX', 'VERB'}:
@@ -84,21 +108,18 @@ def has_finite_verb_and_subject(annotation: List[dict]) -> bool:
         return False
     # find finite verb that are a) root, or b) child of root
     verb = [
-        tok for tok in annotation 
-        if is_finite_verb(tok)
-        and (tok['id'] == root_id or tok.get('head', '') == root_id)
+        tok for tok in annotation
+        if is_finite_verb(tok) and (
+            tok['id'] == root_id or tok.get('head', '') == root_id)
     ]
     if len(verb) == 0:
         return False
-    
-    # find subject
-    def is_subject(tok):
-        pass
+
     # find subject that are a) root, or b) child of root
     subj = [
         tok for tok in annotation
-        if tok['upos'] in {'NOUN', 'PROPN', 'PRON'}
-        and (tok['id'] == root_id or tok.get('head', '') == root_id)
+        if (tok['upos'] in {'NOUN', 'PROPN', 'PRON'}) and (
+            tok['id'] == root_id or tok.get('head', '') == root_id)
     ]
     if len(subj) == 0:
         return False
@@ -120,7 +141,7 @@ def is_misparsed(txt: str):
     -----------
     txt : str
         The sentence as plain text
-    
+
     Returns:
     --------
     flag : bool
@@ -135,7 +156,7 @@ def is_misparsed(txt: str):
     return any(conditions)
 
 
-def has_illegal_chars(txt: str, illegal_chars = '<>|[]/\^@'):
+def has_illegal_chars(txt: str, illegal_chars='<>|[]/\\^@'):
     """Blacklist of illegal characters
 
     Rules:
@@ -144,19 +165,19 @@ def has_illegal_chars(txt: str, illegal_chars = '<>|[]/\^@'):
     - `<>/`  XML/HTML tags
     - `|`    pipe symbol or OR operator
     - `[]`   square brackets, e.g. Markdown links
-    - `\`    escape characters, Windows paths
+    - slash  escape characters, Windows paths
     - `@`    email addresses
-    - `^`    caret, e.g. in regular expressions
+    - caret  regular expressions
     - ...
 
     Parameters:
     -----------
     txt : str
         The sentence as plain text
-    
-    illegal_chars : str (Default '<>|[]/\^@')
+
+    illegal_chars : str (Default)
         The list of illegal characters
-    
+
     Returns:
     --------
     flag : bool
@@ -193,7 +214,8 @@ BLACKLIST_WORDS_DE = [
     'Negerstamm'
 ]
 
-def has_blacklist_words(headword: str, 
+
+def has_blacklist_words(headword: str,
                         lemmas: List[str],
                         blacklist_words: List[str] = BLACKLIST_WORDS_DE):
     a = set(lemmas)
@@ -204,6 +226,7 @@ def has_blacklist_words(headword: str,
 RARE_CHARS_DE = '0123456789\'.,!?)(;:-'
 
 ORD_RARE_CHARS_DE = [ord(c) for c in RARE_CHARS_DE]
+
 
 def factor_rarechars(txt: str,
                      rare_chars: List[int] = ORD_RARE_CHARS_DE,
@@ -217,7 +240,7 @@ def factor_rarechars(txt: str,
 
     rare_chars : List (Default ORD_RARE_CHARS_DE)
         List of characters. Use the ASCII/Unicode IDs, see `ord(c)`
-    
+
     Returns:
     --------
     factor : float
@@ -228,41 +251,41 @@ def factor_rarechars(txt: str,
 
 
 QWERTZ_DE = [
-        '^', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'ß', "'",
-        'q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'ü', '+',
-        'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö', 'ä', '#',
-        '<', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-',
-        '°', '!', '"', '§', '$', '%', '&', '/', '(', ')', '=', '?', '`',
-        'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', 'Ü', '*',
-        'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä', "'",
-        '>', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', '_',
-        '′', '¹', '²', '³', '¼', '½', '¬', '{', '[', ']', '}', '\\', '¸',
-        '@', 'ł', '€', '¶', 'ŧ', '←', '↓', '→', 'ø', 'þ', '"', '~',
-        'æ', 'ſ', 'ð', 'đ', 'ŋ', 'ħ', '̣', 'ĸ', 'ł', '˝', '^', '’',
-        '|', '»', '«', '¢', '„', '“', '”', 'µ', '·', '…', '–',
-        '″', '¡', '⅛', '£', '¤', '⅜', '⅝', '⅞', '™', '±', '°', '¿', '˛',
-        'Ω', 'Ł', '€', '®', 'Ŧ', '¥', '↑', 'ı', 'Ø', 'Þ', '°', '¯',
-        'Æ', 'ẞ', 'Ð', 'ª', 'Ŋ', 'Ħ', '˙', '&', 'Ł', '̣', '̣', '˘',
-        '', '›', '‹', '©', '‚', '‘', '’', 'º', '×', '÷', '—',
-        ' '
-    ]
+    '^', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'ß', "'",
+    'q', 'w', 'e', 'r', 't', 'z', 'u', 'i', 'o', 'p', 'ü', '+',
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ö', 'ä', '#',
+    '<', 'y', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-',
+    '°', '!', '"', '§', '$', '%', '&', '/', '(', ')', '=', '?', '`',
+    'Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O', 'P', 'Ü', '*',
+    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Ö', 'Ä', "'",
+    '>', 'Y', 'X', 'C', 'V', 'B', 'N', 'M', ';', ':', '_',
+    '′', '¹', '²', '³', '¼', '½', '¬', '{', '[', ']', '}', '\\', '¸',
+    '@', 'ł', '€', '¶', 'ŧ', '←', '↓', '→', 'ø', 'þ', '"', '~',
+    'æ', 'ſ', 'ð', 'đ', 'ŋ', 'ħ', '̣', 'ĸ', 'ł', '˝', '^', '’',
+    '|', '»', '«', '¢', '„', '“', '”', 'µ', '·', '…', '–',
+    '″', '¡', '⅛', '£', '¤', '⅜', '⅝', '⅞', '™', '±', '°', '¿', '˛',
+    'Ω', 'Ł', '€', '®', 'Ŧ', '¥', '↑', 'ı', 'Ø', 'Þ', '°', '¯',
+    'Æ', 'ẞ', 'Ð', 'ª', 'Ŋ', 'Ħ', '˙', '&', 'Ł', '̣', '̣', '˘',
+    '', '›', '‹', '©', '‚', '‘', '’', 'º', '×', '÷', '—',
+    ' '
+]
 
 ORDS_QWERTZ_DE = sorted([ord(c) for c in QWERTZ_DE if c])
 
 
 def factor_notkeyboardchar(
-        txt: str, eligible: List[int]=ORDS_QWERTZ_DE):
+        txt: str, eligible: List[int] = ORDS_QWERTZ_DE):
     """Computes the percentage of characters not typable on a German keyboard.
-    
+
     Parameters:
     -----------
     txt : str
         The sentence to evaluate
-    
+
     eligible : List[int] (Default ORDS_QWERTZ_DE)
         The list of eligible characters (ordinals) that are typable on a
         German keyboard. Use the ASCII/Unicode IDs, see `ord(c)`
-    
+
     Returns:
     --------
     factor : float
@@ -277,7 +300,7 @@ def factor_graylist_words(headword: str,
                           penalty_factor: float = 0.1):
     """Penalize graylist words"""
     num_matches = len([
-        lem for lem in lemmas 
+        lem for lem in lemmas
         if lem != headword and lem in graylist_words])
     return max(0.0, 1.0 - penalty_factor * num_matches)
 
@@ -299,36 +322,36 @@ def factor_named_entity(headword: str,
     -----------
     headword : str
         The headword (lemma) to evaluate in combination with the sentence.
-    
+
     annotation : List[dict]
         The linguistic annoations of the sentence
-    
+
     penality_factor : float (Default 0.15)
         The penality factor for each named entity occurence
-    
+
     Returns:
     --------
     factors : float
         Number between 0.0 and 1.0
     """
-    num_matches = len([
-        tok for tok in annotation 
-        if tok.get('lemma', '') == headword
-        and (tok.get('upos', '') == 'PROPN' or tok.get('xpos') == 'NE')
-    ])
+    num_matches = 0
+    for tok in annotation:
+        if tok.get('lemma', '') == headword:
+            if (tok.get('upos', '') == 'PROPN') or (tok.get('xpos') == 'NE'):
+                num_matches += 1
     return max(0.0, 1.0 - penalty_factor * num_matches)
 
 
-def _deixis(headword: str, 
-            lemmas: List[str], 
+def _deixis(headword: str,
+            lemmas: List[str],
             deixis_terms: List[str],
             penalty_factor: float = 0.1):
     """Deixis factor function
-    
+
     Utility function used for deixis_space and deixis_time.
     """
     num_matches = len([
-        lem for lem in lemmas 
+        lem for lem in lemmas
         if lem != headword and lem in deixis_terms])
     return max(0.0, 1.0 - penalty_factor * num_matches)
 
@@ -338,27 +361,27 @@ DEFAULT_SPACE_DEIXIS_TERMS = [
     'von', 'oben', 'unten']
 
 
-def deixis_space(headword: str, 
+def deixis_space(headword: str,
                  lemmas: List[str],
                  space_deixis_terms: List[str] = DEFAULT_SPACE_DEIXIS_TERMS,
                  penalty_factor: float = 0.1) -> float:
     """Space deixis penality
-    
+
     Parameters:
     -----------
     headword : str
         The headword (lemma) to evaluate in combination with the sentence.
         The headword is excluded from the count.
-    
+
     lemmas : List[str]
         All lemmas of the sentence
-    
+
     space_deixis_terms : List[str] (Default DEFAULT_SPACE_DEIXIS_TERMS)
         The space deixis terms to look for in the sentence
-    
+
     penalty_factor : float (Default 0.1)
         The penality factor for each space deixis occurence
-    
+
     Returns:
     --------
     factors : float
@@ -369,8 +392,8 @@ def deixis_space(headword: str,
     ------------
     https://gsw.phil-fak.uni-duesseldorf.de/diskurslinguistik/index.php?title=Deiktischer_Ausdruck
     """
-    return _deixis(headword=headword, 
-                   lemmas=lemmas, 
+    return _deixis(headword=headword,
+                   lemmas=lemmas,
                    deixis_terms=space_deixis_terms,
                    penalty_factor=penalty_factor)
 
@@ -380,28 +403,28 @@ DEFAULT_TIME_DEIXIS_TERMS = [
     'kürzlich']
 
 
-def deixis_time(headword: str, 
+def deixis_time(headword: str,
                 lemmas: List[str],
                 time_deixis_terms: List[str] = DEFAULT_TIME_DEIXIS_TERMS,
                 penalty_factor: float = 0.1) -> float:
     """Time deixis penality
-    
+
     Parameters:
     -----------
     headword : str
         The headword (lemma) to evaluate in combination with the sentence.
         The headword is excluded from the count.
-    
+
     lemmas : List[str]
         All lemmas of the sentence
-    
+
     time_deixis_terms : List[str] (Default DEFAULT_TIME_DEIXIS_TERMS)
         The time deixis terms to look for in the sentence
-    
+
     penalty_factor : float (Default 0.1)
         The penality factor for each time deixis occurence
         in the sentence.
-    
+
     Returns:
     --------
     factors : float
@@ -411,13 +434,13 @@ def deixis_time(headword: str,
     ------------
     https://gsw.phil-fak.uni-duesseldorf.de/diskurslinguistik/index.php?title=Deiktischer_Ausdruck
     """
-    return _deixis(headword=headword, 
-                   lemmas=lemmas, 
+    return _deixis(headword=headword,
+                   lemmas=lemmas,
                    deixis_terms=time_deixis_terms,
                    penalty_factor=penalty_factor)
 
 
-def deixis_person(headword: str, 
+def deixis_person(headword: str,
                   annotation: List[dict],
                   penalty_factor: float = 0.1) -> float:
     """Personal deixis penality
@@ -439,9 +462,9 @@ def deixis_person(headword: str,
 
     annotation : List[dict]
         The linguistic annoations of the sentence
-    
+
     penality_factor : float (Default 0.1)
-        The penality factor for each personal deixis occurence 
+        The penality factor for each personal deixis occurence
         in the sentence.
 
     Returns:
@@ -449,18 +472,19 @@ def deixis_person(headword: str,
     factors : float
         Number between 0.0 and 1.0
     """
-    num_matches = len([
-        t for t in annotation 
-        if t.get('feats', {}).get('PronType', '') in [
-            'Prs', 'Dem', 'Ind', 'Neg', 'Tot']
-        and t.get('upos', '') == 'PRON'
-        and t['lemma'] != headword])
+    PTyp = {'Prs', 'Dem', 'Ind', 'Neg', 'Tot'}
+    num_matches = 0
+    for t in annotation:
+        if t['lemma'] != headword:
+            if t.get('upos', '') == 'PRON':
+                if t.get('feats', {}).get('PronType', '') in PTyp:
+                    num_matches += 1
     return max(0.0, 1.0 - penalty_factor * num_matches)
 
 
-def optimal_interval(num_tokens: int, low: int=10, high: int=20) -> float:
+def optimal_interval(num_tokens: int, low: int = 10, high: int = 20) -> float:
     """Optimal sentence length by the number of word tokens
-    
+
     Parameters:
     -----------
     num_tokens : int
@@ -491,4 +515,3 @@ def optimal_interval(num_tokens: int, low: int=10, high: int=20) -> float:
             return 0.
         diff = (2 * high) - num_tokens
         return diff / high
-

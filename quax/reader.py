@@ -23,11 +23,11 @@ def parse_conllu(corpus: List[conllu.models.TokenList]) -> List[dict]:
         for tok in sent:
             d = {
                 "id": tok['id'],
-                'text': tok['form'], 
+                'text': tok['form'],
                 'lemma': tok['lemma'],
-                'upos': tok['upos'], 
+                'upos': tok['upos'],
                 'feats': tok['feats'],
-                'head': tok['head'], 
+                'head': tok['head'],
                 'deprel': tok['deprel']
             }
             s.append(d)
