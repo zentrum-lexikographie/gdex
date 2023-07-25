@@ -1,7 +1,7 @@
 [![PyPI version](https://badge.fury.io/py/quaxa.svg)](https://badge.fury.io/py/quaxa)
 [![PyPi downloads](https://img.shields.io/pypi/dm/quaxa)](https://img.shields.io/pypi/dm/quaxa)
 
-# QUAX: QUAlity of sentence eXamples scoring
+# QUAXA: QUAlity of sentence eXAmples scoring
 Rule-based sentence scoring algorithm based on GDEX.
 
 
