@@ -1,39 +1,27 @@
 [![PyPI version](https://badge.fury.io/py/quax.svg)](https://badge.fury.io/py/quax)
 [![PyPi downloads](https://img.shields.io/pypi/dm/quax)](https://img.shields.io/pypi/dm/quax)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4284804.svg)](https://doi.org/10.5281/zenodo.4284804)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/ulf1/quax/master?urlpath=lab)
-[![Gitpod - Code Now](https://img.shields.io/badge/Gitpod-code%20now-blue.svg?longCache=true)](https://gitpod.io#https://github.com/ulf1/quax)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/ulf1/quax.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ulf1/quax/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/ulf1/quax.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/ulf1/quax/context:python)
 
 # QUAX: QUAlity of sentence eXamples scoring
-
-## DELETE THIS LATER 
-Download quax and rename it
-
-```
-git clone git@github.com:kmedian/quax.git mycoolpkg
-cd mycoolpkg
-bash rename.sh "ulf1" "mycoolpkg" "Real Name"
-```
-
-Reinitialize the repo:
-
-```
-rm -rf .git
-git init
-git remote add origin git@github.com:ulf1/mycoolpkg.git
-```
+Rule-based sentence scoring algorithm based on GDEX.
 
 
-## Usage
-
-Table of Contents
-
-* [Use Case 1](#use-case-1)
+## Rules
 
 
-### Use Case 1
+| Funktion | Ausgabe | Beschreibung | Hinweis |
+|:---:|:---:|:---|:---|
+| `factor_named_entity` | [1.0 - penalty, 1.0] | Strafe Satzbeleg ab, wenn Lemma ein o. Teil eines Eigennamen ist | [1] GDEX upper case (rare chars), [2] GBEX NE |
+| `deixis_time` | [0.0, 1.0] | Strafe Signalwörter für Temporaldeixis ab. | [2] GBEX Dexis; [3] |
+| `deixis_space` | [0.0, 1.0] | Strafe Signalwörter für Lokaldeixis ab. | [2] GBEX Dexis; [3] |
+| `deixis_person` | [0.0, 1.0] | Strafe Wörter mit `UPOS=PRON` und `PronType=Prs|Dem|Ind|Neg|Tot` ab. Entspricht STTS PoS-Tags `PDS` (`PRON` + `Dem`, z.B, das, dies, die, diese, der), `PIS` (`PRON` + `Ind|Neg|Tot`, z.B, man, allem, nichts, alles, mehr), `PPER` (`PRON` + `Prs`, z.B, es, sie, er, wir, ich), `PPOSS` (`PRON` + `Prs`, z.B, ihren, Seinen, seinem, unsrigen, meiner). | [1] GDEX graylist PoS- Tags, [2] GBEX Dexis; [3], [4] |
+| `optimal_interval` | [0.0, 1.0] | Strafe Satzbelege mit zu wenigen/vielen Wörter ab ab. | [1] GDEX |
+
+
+Quellen:
+- [1] Lexical Computing, "GDEX configuration introduction", URL: https://www.sketchengine.eu/syntax-of-gdex-configuration-files/
+- [2] Didakowski, Lemnitzer, Geyken, 2012, "Automatic example sentence ex- traction for a contemporary German dictionary", URL: https://euralex.org/publications/automatic-example-sentence-extraction-for-a-contemporary-german-dictionary/
+- [3] LingTermNet, URL: https://gsw.phil-fak.uni-duesseldorf.de/diskurslinguistik/index.php?title=Deiktischer_Ausdruck
+- [4] Universial Dependency, UPOS-STTS conversion table, URL: https://universaldependencies.org/tagset-conversion/de-stts-uposf.html
 
 
 ## Appendix
@@ -54,7 +42,6 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt --no-cache-dir
 pip install -r requirements-dev.txt --no-cache-dir
-pip install -r requirements-demo.txt --no-cache-dir
 ```
 
 (If your git repo is stored in a folder with whitespaces, then don't use the subfolder `.venv`. Use an absolute path without whitespaces.)
@@ -63,12 +50,11 @@ pip install -r requirements-demo.txt --no-cache-dir
 
 * Jupyter for the examples: `jupyter lab`
 * Check syntax: `flake8 --ignore=F401 --exclude=$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')`
-* Run Unit Tests: `PYTHONPATH=. pytest`
+* Run Unit Tests: `PYTHONPATH=. python -m unittest`
 
 Publish
 
 ```sh
-pandoc README.md --from markdown --to rst -s -o README.rst
 python setup.py sdist 
 twine upload -r pypi dist/*
 ```
@@ -89,3 +75,11 @@ Please [open an issue](https://github.com/ulf1/quax/issues/new) for support.
 
 ### Contributing
 Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/ulf1/quax/compare/).
+
+
+### Acknowledgements
+The "Evidence" project was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) - [433249742](https://gepris.dfg.de/gepris/projekt/433249742) (GU 798/27-1; GE 1119/11-1).
+
+### Maintenance
+- till 31.Aug.2023 (v0.1.0) the code repository was maintained within the DFG project [433249742](https://gepris.dfg.de/gepris/projekt/433249742)
+- since 01.Sep.2023 (v0.1.0) the code repository is maintained by Ulf Hamster.

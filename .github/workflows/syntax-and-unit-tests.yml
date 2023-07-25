@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.x']
+        python-version: ['3.7', '3.x']
     
     name: Python ${{ matrix.python-version }} Tests
 
@@ -28,8 +28,6 @@ jobs:
     - name: Lint with flake8
       run: |
         flake8 --ignore=F401 --exclude=$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')
-    - name: Unit Test with pytest
+    - name: Unit Test with unittest
       run: |
-        PYTHONPATH=. pytest
-    #- name: Codecov
-    #  uses: codecov/codecov-action@v1.4.1
+        PYTHONPATH=. python -m unittest

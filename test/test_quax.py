@@ -1,192 +1,664 @@
 import unittest
+import quax
 
-from quax.quax import is_whole_sentence, is_misparsed, has_illegal_chars, has_blacklist_words, \
-factor_graylist_rarechars, factor_graylist_nongermankeyboardchars, factor_graylist_words, \
-greylist_ne, ortsdeixis, zeitdeixis, personendeixis, optimal_interval
+
+SENTS = [
+    "Manasse ist ein einzigartiger Parfümeur.",
+    "Ich hatte Gelegenheit eines seiner Seminare zu besuchen.",
+    (
+        "7 Tage Erholung im Ferienhaus am Müritz See in einer idyllischen "
+        "Landschaft inmitten der Mecklenburgischen Seenplatte.")
+]
+
+
+ANNOTS = [
+    [
+        {
+            "id": 1,
+            "text": "Manasse",
+            "lemma": "Manasse",
+            "upos": "PROPN",
+            "feats": {
+                "Case": "Nom",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 5,
+            "deprel": "nsubj"
+        },
+        {
+            "id": 2,
+            "text": "ist",
+            "lemma": "sein",
+            "upos": "AUX",
+            "feats": {
+                "Mood": "Ind",
+                "Number": "Sing",
+                "Person": "3",
+                "Tense": "Pres",
+                "VerbForm": "Fin"
+            },
+            "head": 5,
+            "deprel": "cop"
+        },
+        {
+            "id": 3,
+            "text": "ein",
+            "lemma": "ein",
+            "upos": "DET",
+            "feats": {
+                "Case": "Nom",
+                "Definite": "Ind",
+                "Gender": "Masc",
+                "Number": "Sing",
+                "NumType": "Card",
+                "PronType": "Art"
+            },
+            "head": 5,
+            "deprel": "det"
+        },
+        {
+            "id": 4,
+            "text": "einzigartiger",
+            "lemma": "einzigartig",
+            "upos": "ADJ",
+            "feats": {
+                "Case": "Nom",
+                "Degree": "Pos",
+                "Gender": "Masc",
+                "Number": "Sing"
+            },
+            "head": 5,
+            "deprel": "amod"
+        },
+        {
+            "id": 5,
+            "text": "Parfümeur",
+            "lemma": "Parfümeur",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Nom",
+                "Gender": "Masc",
+                "Number": "Sing"
+            },
+            "head": 0,
+            "deprel": "root"
+        },
+        {
+            "id": 6,
+            "text": ".",
+            "lemma": ".",
+            "upos": "PUNCT",
+            "head": 5,
+            "deprel": "punct"
+        }
+    ],
+    [
+        {
+            "id": 1,
+            "text": "Ich",
+            "lemma": "ich",
+            "upos": "PRON",
+            "feats": {
+                "Case": "Nom",
+                "Number": "Sing",
+                "Person": "1",
+                "PronType": "Prs"
+            },
+            "head": 2,
+            "deprel": "nsubj"
+        },
+        {
+            "id": 2,
+            "text": "hatte",
+            "lemma": "haben",
+            "upos": "VERB",
+            "feats": {
+                "Mood": "Ind",
+                "Number": "Sing",
+                "Person": "1",
+                "Tense": "Past",
+                "VerbForm": "Fin"
+            },
+            "head": 0,
+            "deprel": "root"
+        },
+        {
+            "id": 3,
+            "text": "Gelegenheit",
+            "lemma": "Gelegenheit",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Acc",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 2,
+            "deprel": "obj"
+        },
+        {
+            "id": 4,
+            "text": "eines",
+            "lemma": "ein",
+            "upos": "DET",
+            "feats": {
+                "Case": "Acc",
+                "Definite": "Ind",
+                "Gender": "Neut",
+                "Number": "Sing",
+                "NumType": "Card",
+                "PronType": "Art"
+            },
+            "head": 6,
+            "deprel": "det"
+        },
+        {
+            "id": 5,
+            "text": "seiner",
+            "lemma": "sein",
+            "upos": "DET",
+            "feats": {
+                "Case": "Gen",
+                "Gender": "Neut",
+                "Gender[psor]": "Masc,Neut",
+                "Number": "Plur",
+                "Number[psor]": "Sing",
+                "Person": "3",
+                "Poss": "Yes",
+                "PronType": "Prs"
+            },
+            "head": 6,
+            "deprel": "det:poss"
+        },
+        {
+            "id": 6,
+            "text": "Seminare",
+            "lemma": "Seminar",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Gen",
+                "Gender": "Neut",
+                "Number": "Plur"
+            },
+            "head": 8,
+            "deprel": "obj"
+        },
+        {
+            "id": 7,
+            "text": "zu",
+            "lemma": "zu",
+            "upos": "PART",
+            "head": 8,
+            "deprel": "mark"
+        },
+        {
+            "id": 8,
+            "text": "besuchen",
+            "lemma": "besuchen",
+            "upos": "VERB",
+            "feats": {
+                "VerbForm": "Inf"
+            },
+            "head": 3,
+            "deprel": "xcomp"
+        },
+        {
+            "id": 9,
+            "text": ".",
+            "lemma": ".",
+            "upos": "PUNCT",
+            "head": 2,
+            "deprel": "punct"
+        }
+    ],
+    [
+        {
+            "id": 1,
+            "text": "7",
+            "lemma": "7",
+            "upos": "NUM",
+            "feats": {
+                "NumType": "Card"
+            },
+            "head": 2,
+            "deprel": "nummod"
+        },
+        {
+            "id": 2,
+            "text": "Tage",
+            "lemma": "Tag",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Nom",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 3,
+            "deprel": "nmod"
+        },
+        {
+            "id": 3,
+            "text": "Erholung",
+            "lemma": "Erholung",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Acc",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 0,
+            "deprel": "root"
+        },
+        {
+            "id": (4, "-", 5),
+            "text": "im",
+            "lemma": "_",
+            "upos": "_",
+            "deprel": "_"
+        },
+        {
+            "id": 4,
+            "text": "in",
+            "lemma": "in",
+            "upos": "ADP",
+            "head": 6,
+            "deprel": "case"
+        },
+        {
+            "id": 5,
+            "text": "dem",
+            "lemma": "der",
+            "upos": "DET",
+            "feats": {
+                "Case": "Dat",
+                "Definite": "Def",
+                "Gender": "Neut",
+                "Number": "Sing",
+                "PronType": "Art"
+            },
+            "head": 6,
+            "deprel": "det"
+        },
+        {
+            "id": 6,
+            "text": "Ferienhaus",
+            "lemma": "Ferienhaus",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Dat",
+                "Gender": "Neut",
+                "Number": "Sing"
+            },
+            "head": 3,
+            "deprel": "nmod"
+        },
+        {
+            "id": (7, "-", 8),
+            "text": "am",
+            "lemma": "_",
+            "upos": "_",
+            "deprel": "_"
+        },
+        {
+            "id": 7,
+            "text": "an",
+            "lemma": "an",
+            "upos": "ADP",
+            "head": 9,
+            "deprel": "case"
+        },
+        {
+            "id": 8,
+            "text": "dem",
+            "lemma": "der",
+            "upos": "DET",
+            "feats": {
+                "Case": "Dat",
+                "Definite": "Def",
+                "Gender": "Masc",
+                "Number": "Sing",
+                "PronType": "Art"
+            },
+            "head": 9,
+            "deprel": "det"
+        },
+        {
+            "id": 9,
+            "text": "Müritz",
+            "lemma": "Müritz",
+            "upos": "PROPN",
+            "feats": {
+                "Case": "Dat",
+                "Gender": "Masc",
+                "Number": "Sing"
+            },
+            "head": 6,
+            "deprel": "nmod"
+        },
+        {
+            "id": 10,
+            "text": "See",
+            "lemma": "See",
+            "upos": "PROPN",
+            "feats": {
+                "Case": "Dat",
+                "Gender": "Masc",
+                "Number": "Sing"
+            },
+            "head": 9,
+            "deprel": "flat"
+        },
+        {
+            "id": 11,
+            "text": "in",
+            "lemma": "in",
+            "upos": "ADP",
+            "head": 14,
+            "deprel": "case"
+        },
+        {
+            "id": 12,
+            "text": "einer",
+            "lemma": "ein",
+            "upos": "DET",
+            "feats": {
+                "Case": "Dat",
+                "Definite": "Ind",
+                "Gender": "Fem",
+                "Number": "Sing",
+                "NumType": "Card",
+                "PronType": "Art"
+            },
+            "head": 14,
+            "deprel": "det"
+        },
+        {
+            "id": 13,
+            "text": "idyllischen",
+            "lemma": "idyllisch",
+            "upos": "ADJ",
+            "feats": {
+                "Case": "Dat",
+                "Degree": "Pos",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 14,
+            "deprel": "amod"
+        },
+        {
+            "id": 14,
+            "text": "Landschaft",
+            "lemma": "Landschaft",
+            "upos": "NOUN",
+            "feats": {
+                "Case": "Dat",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 9,
+            "deprel": "nmod"
+        },
+        {
+            "id": 15,
+            "text": "inmitten",
+            "lemma": "inmitten",
+            "upos": "ADP",
+            "head": 18,
+            "deprel": "case"
+        },
+        {
+            "id": 16,
+            "text": "der",
+            "lemma": "der",
+            "upos": "DET",
+            "feats": {
+                "Case": "Dat",
+                "Definite": "Def",
+                "Gender": "Fem",
+                "Number": "Sing",
+                "PronType": "Art"
+            },
+            "head": 18,
+            "deprel": "det"
+        },
+        {
+            "id": 17,
+            "text": "Mecklenburgischen",
+            "lemma": "Mecklenburgischen",
+            "upos": "PROPN",
+            "feats": {
+                "Case": "Dat",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 18,
+            "deprel": "amod"
+        },
+        {
+            "id": 18,
+            "text": "Seenplatte",
+            "lemma": "Seenplatte",
+            "upos": "PROPN",
+            "feats": {
+                "Case": "Dat",
+                "Gender": "Fem",
+                "Number": "Sing"
+            },
+            "head": 9,
+            "deprel": "nmod"
+        },
+        {
+            "id": 19,
+            "text": ".",
+            "lemma": ".",
+            "upos": "PUNCT",
+            "head": 3,
+            "deprel": "punct"
+        }
+    ]
+]
+
 
 class QuaxTester(unittest.TestCase):
     def setUp(self):
-        # EXAMPLE 1
-        self.sent1 = 'Ich hatte Gelegenheit eines seiner Seminare zu besuchen.',
-        self.tree1 = [{'text': 'Ich',
-                'lemma': 'ich',
-                'pos': 'PRON',
-                'tag': 'PPER',
-                'head': 'hatte',
-                'dep': 'nsubj',
-                'children': []},
-                {'text': 'hatte',
-                'lemma': 'haben',
-                'pos': 'VERB',
-                'tag': 'VAFIN',
-                'head': '',
-                'dep': 'root',
-                'children': ['Ich', 'Gelegenheit', '.']},
-                {'text': 'Gelegenheit',
-                'lemma': 'Gelegenheit',
-                'pos': 'NOUN',
-                'tag': 'NN',
-                'head': 'hatte',
-                'dep': 'obj',
-                'children': ['besuchen']},
-                {'text': 'eines',
-                'lemma': 'ein',
-                'pos': 'DET',
-                'tag': 'PIS',
-                'head': 'Seminare',
-                'dep': 'det',
-                'children': []},
-                {'text': 'seiner',
-                'lemma': 'sein',
-                'pos': 'DET',
-                'tag': 'PPOSAT',
-                'head': 'Seminare',
-                'dep': 'det:poss',
-                'children': []},
-                {'text': 'Seminare',
-                'lemma': 'Seminar',
-                'pos': 'NOUN',
-                'tag': 'NN',
-                'head': 'besuchen',
-                'dep': 'obj',
-                'children': ['eines', 'seiner']},
-                {'text': 'zu',
-                'lemma': 'zu',
-                'pos': 'PART',
-                'tag': 'PTKZU',
-                'head': 'besuchen',
-                'dep': 'mark',
-                'children': []},
-                {'text': 'besuchen',
-                'lemma': 'besuchen',
-                'pos': 'VERB',
-                'tag': 'VVINF',
-                'head': 'Gelegenheit',
-                'dep': 'xcomp',
-                'children': ['Seminare', 'zu']},
-                {'text': '.',
-                'lemma': '.',
-                'pos': 'PUNCT',
-                'tag': '$.',
-                'head': 'hatte',
-                'dep': 'punct',
-                'children': []}]
-        self.lemma1 = 'haben'
-        self.tokens1 = ['Ich',
-                    'hatte',
-                    'Gelegenheit',
-                    'eines',
-                    'seiner',
-                    'Seminare',
-                    'zu',
-                    'besuchen',
-                    '.']
-        self.lemmata1 = ['ich',
-                    'haben',
-                    'Gelegenheit',
-                    'ein',
-                    'sein',
-                    'Seminar',
-                    'zu',
-                    'besuchen',
-                    '.']
-        self.upos1 = ['PRON', 'VERB', 'NOUN', 'DET', 'DET', 'NOUN', 'PART', 'VERB', 'PUNCT']
-        self.xpos1 = ['PPER', 'VAFIN', 'NN', 'PIS', 'PPOSAT', 'NN', 'PTKZU', 'VVINF', '$.']
+        self.sents = SENTS
+        self.annots = ANNOTS
+        self.lemmata = [
+            [tok.get('lemma') for tok in tree] for tree in self.annots]
 
+    def test_total_score(self):
+        for txt, annot in zip(self.sents, self.annots):
+            for tok in annot:
+                if tok.get('upos', '') in {'NOUN', 'VERB', 'ADJ'}:
+                    headword = tok['lemma']
+                    factor = quax.total_score(
+                        headword=headword, txt=txt, annotation=annot)
+                    print((
+                        "total_score:"
+                        f"{factor: 7.4f}  | {headword} | {txt[:20]} ..."))
+                    self.assertGreaterEqual(factor, 0.)
+                    self.assertLessEqual(factor, 1.)
 
-    def test_is_whole_sentence(self):
-        result1 = is_whole_sentence(self.sent1, self.tree1)
-        self.assertTrue(result1)
-        txt = 'Keine Ahnung, was das soll.'
-        baum = [
-            {'text': 'Keine', 'lemma': 'kein', 'pos': 'DET', 'tag': 'PIAT', 'dep': 'nk', 'head': 'Ahnung', 'children': []},
-            {'text': 'Ahnung', 'lemma': 'Ahnung', 'pos': 'NOUN', 'tag': 'NN', 'dep': 'ROOT', 'head': 'Ahnung', 'children': ['Keine', ',', 'soll', '.']},
-            {'text': ',', 'lemma': '--', 'pos': 'PUNCT', 'tag': '$,', 'dep': 'punct', 'head': 'Ahnung', 'children': []},
-            {'text': 'was', 'lemma': 'wer', 'pos': 'PRON', 'tag': 'PWS', 'dep': 'oa', 'head': 'soll', 'children': []},
-            {'text': 'das', 'lemma': 'der', 'pos': 'PRON', 'tag': 'PDS', 'dep': 'sb', 'head': 'soll', 'children': []},
-            {'text': 'soll', 'lemma': 'sollen', 'pos': 'AUX', 'tag': 'VMFIN', 'dep': 'rc', 'head': 'Ahnung', 'children': ['was', 'das']},
-            {'text': '.', 'lemma': '--', 'pos': 'PUNCT', 'tag': '$.', 'dep': 'punct', 'head': 'Ahnung', 'children': []}
-            ]
-        result2 = is_whole_sentence(txt, baum)
-        self.assertFalse(result2)
+    def test_isa_knockout_criteria(self):
+        for txt, annot in zip(self.sents, self.annots):
+            for tok in annot:
+                if tok.get('upos', '') in {'NOUN', 'VERB', 'ADJ'}:
+                    headword = tok['lemma']
+                    flag = quax.isa_knockout_criteria(
+                        headword=headword, txt=txt, annotation=annot)
+                    print((
+                        "isa_knockout_criteria:"
+                        f"{flag}  | {headword} | {txt[:20]} ..."))
+                    self.assertIs(flag is True or flag is False, True)
+
+    def test_factor_gradual_criteria(self):
+        for txt, annot in zip(self.sents, self.annots):
+            for tok in annot:
+                if tok.get('upos', '') in {'NOUN', 'VERB', 'ADJ'}:
+                    headword = tok['lemma']
+                    factor = quax.factor_gradual_criteria(
+                        headword=headword, txt=txt, annotation=annot)
+                    print((
+                        "factor_gradual_criteria:"
+                        f"{factor:7.4f}  | {headword} | {txt[:20]} ..."))
+                    self.assertGreaterEqual(factor, 0.)
+                    self.assertLessEqual(factor, 1.)
+
+    def test_has_finite_verb_and_subject(self):
+        target = [True, True, False]
+        for i, annot in enumerate(self.annots):
+            res = quax.has_finite_verb_and_subject(annot)
+            self.assertEqual(res, target[i])
 
     def test_is_misparsed(self):
-        result1 = is_misparsed(self.sent1)
-        self.assertFalse(result1)
-        result2 = is_misparsed('Das ist ein Beispieltext')
-        self.assertTrue(result2)
-        result3 = is_misparsed('das ist ein Beispieltext.')
-        self.assertTrue(result3)
-        result4 = is_misparsed('\tDas ist ein Beispieltext.')
-        self.assertTrue(result4)
+        for sent in self.sents:
+            res = quax.is_misparsed(sent)
+            self.assertFalse(res)
+
+        res = quax.is_misparsed('Das ist ein Beispieltext.')
+        self.assertFalse(res)
+
+        res = quax.is_misparsed('Das ist ein Beispieltext')
+        self.assertTrue(res)
+
+        res = quax.is_misparsed('das ist ein Beispieltext.')
+        self.assertTrue(res)
+
+        res = quax.is_misparsed('\tDas ist ein Beispieltext.')
+        self.assertTrue(res)
 
     def test_has_illegal_chars(self):
-        result1 = has_illegal_chars(self.sent1)
-        self.assertFalse(result1)
-        result2 = has_illegal_chars('https://somerandomurl.com')
-        self.assertTrue(result2)
-        result3 = has_illegal_chars('name@mail.com')
-        self.assertTrue(result3)
+        for sent in self.sents:
+            res = quax.has_illegal_chars(sent)
+            self.assertFalse(res)
+
+        res = quax.has_illegal_chars('https://somerandomurl.com')
+        self.assertTrue(res)
+
+        res = quax.has_illegal_chars('name@mail.com')
+        self.assertTrue(res)
+
+        res = quax.has_illegal_chars('my test\rnew windows paragraph')
+        self.assertTrue(res)
 
     def test_has_blacklist_words(self):
-        result1 = has_blacklist_words(self.sent1, self.lemma1, self.lemmata1)
-        self.assertFalse(result1)
-        result2 = has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Beispielsatz',
-            ['und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
-        self.assertTrue(result2)
-        result3 = has_blacklist_words("Und das ist ein Beispielsatz mit Idiot.", 'Idiot',
-            ['und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
-        self.assertTrue(result3)
+        for annot in self.annots:
+            lemmas = [tok.get('lemma') for tok in annot]
+            for tok in annot:
+                headword = tok['lemma']
+                res = quax.has_blacklist_words(
+                    headword=headword, lemmas=lemmas)
+                self.assertFalse(res)
+
+        res = quax.has_blacklist_words('Beispielsatz', [
+            'und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
+        self.assertTrue(res)
+
+        res = quax.has_blacklist_words('Idiot', [
+            'und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
+        self.assertFalse(res)
 
     def test_factor_graylist_rarechars(self):
-        result1 = factor_graylist_rarechars(self.sent1)
-        self.assertGreater(result1, 0.5)
-        result2 = factor_graylist_rarechars("''..??")
-        self.assertGreater(0.5, result2)
+        target = [0.9, 0.9, 0.8]
+        for i, sent in enumerate(self.sents):
+            res = quax.factor_rarechars(sent)
+            self.assertEqual(res, target[i])
 
-    def test_factor_graylist_nongermankeyboardchars(self):
-        result1 = factor_graylist_nongermankeyboardchars(self.sent1)
-        self.assertEqual(result1, 1.)
-        result2 = factor_graylist_nongermankeyboardchars('ßÄÖÜäöü')
-        self.assertEqual(result2, 1.)
-        result3 = factor_graylist_nongermankeyboardchars('À la carte, s\'il vous plaît\n')
-        self.assertLess(result3, 1.)
+        res = quax.factor_rarechars("\'\'..??")
+        self.assertAlmostEqual(res, 0.4)  # rounding error
+
+    def test_factor_graylist_notkeyboardchar(self):
+        for sent in self.sents:
+            res = quax.factor_notkeyboardchar(sent)
+            self.assertEqual(res, 1.)
+
+        res = quax.factor_notkeyboardchar('ßÄÖÜäöü')
+        self.assertEqual(res, 1.)
+
+        res = quax.factor_notkeyboardchar(
+            'À la carte, s\'il vous plaît\n')
+        self.assertLess(res, 1.0)
 
     def test_factor_graylist_words(self):
-        result1 = factor_graylist_words(self.sent1, self.xpos1)
-        self.assertLess(result1, 1.)
-        result2 = factor_graylist_words('Kein Problem.', ['PIAT', 'NN'])
-        self.assertEqual(result2, 1.)
+        GRAYLIST = ['Seminar']
+        target = [1.0, 0.9, 1.0]
+        for i, annot in enumerate(self.annots):
+            lemmas = [tok.get('lemma') for tok in annot]
+            for tok in annot:
+                headword = tok['lemma']
+                res = quax.factor_graylist_words(
+                    headword=headword, lemmas=lemmas, graylist_words=GRAYLIST)
+                if headword in GRAYLIST:
+                    self.assertEqual(res, target[i] + 0.1)
+                else:
+                    self.assertEqual(res, target[i])
 
-    def test_greylist_ne(self):
-        result1 = greylist_ne(self.sent1, self.upos1, self.xpos1)
-        self.assertEqual(result1, 1.)
-        result2 = greylist_ne('Manasse ist ein einzigartiger Parfümeur.',
-                              ['PROPN', 'AUX', 'DET', 'ADJ', 'NOUN', 'PUNCT'],
-                              ['NE', 'VAFIN', 'ART', 'ADJA', 'NN', '$.'])
-        self.assertLess(result2, 1.)
+    def test_factor_named_entity(self):
+        for annot in self.annots:
+            for tok in annot:
+                headword = tok['lemma']
+                res = quax.factor_named_entity(
+                    headword=headword, annotation=annot, penalty_factor=0.15)
+                flag = tok.get('upos', '') == 'PROPN'
+                flag = flag or tok.get('xpos', '') == 'NE'
+                if flag:
+                    self.assertEqual(res, 0.85)
+                else:
+                    self.assertEqual(res, 1.0)
 
     def test_deixis(self):
-        result1 = [ortsdeixis(self.sent1, self.lemma1, self.lemmata1),
-                   zeitdeixis(self.sent1, self.lemma1, self.lemmata1),
-                   personendeixis(self.sent1, self.lemma1, self.lemmata1)]
-        self.assertEqual(result1, [0, 0, 0])
-        sent2, lemmata2 = "Heute hier, morgen dort.", ['heute', 'hier', '--', 'morgen', 'dort', '--']
-        result2 = [ortsdeixis(sent2, 'heute', lemmata2),
-                   zeitdeixis(sent2, 'heute', lemmata2),
-                   personendeixis(sent2, 'heute', lemmata2)]
-        self.assertEqual(result2, [2, 1, 0])
-        result3 = [ortsdeixis(sent2, 'hier', lemmata2),
-                   zeitdeixis(sent2, 'hier', lemmata2),
-                   personendeixis(sent2, 'hier', lemmata2)]
-        self.assertEqual(result3, [1, 2, 0])
+        lemmas = ['heute', 'hier', '--', 'morgen', 'dort', '--']
+        result2 = [quax.deixis_space('heute', lemmas),
+                   quax.deixis_time('heute', lemmas)]
+        self.assertEqual(result2, [.8, .9])
+
+        result3 = [quax.deixis_space('hier', lemmas),
+                   quax.deixis_time('hier', lemmas)]
+        self.assertEqual(result3, [.9, .8])
+
+    def test_deixis_person(self):
+        target = [1.0, 0.9, 1.0]
+        for i, annot in enumerate(self.annots):
+            for tok in annot:
+                headword = tok['lemma']
+                res = quax.deixis_person(
+                    headword=headword, annotation=annot)
+                flag = tok.get('upos', '') == 'PRON'
+                flag = flag and tok.get('feats', {}).get('PronType', '') in [
+                    'Prs', 'Dem', 'Ind', 'Neg', 'Tot']
+                if flag:
+                    self.assertEqual(res, target[i] + 0.1)
+                else:
+                    self.assertEqual(res, target[i])
 
     def test_optimal_interval(self):
-        result1 = optimal_interval(self.tokens)
-        self.assertLess(result1, 1.)
-        result2 = optimal_interval('Das ist ein Beispielsatz mit optimaler Länge von über 10 Tokens.')
+        for annot in self.annots:
+            num_tokens = len(annot)
+            res = quax.optimal_interval(
+                num_tokens=num_tokens,
+                low=num_tokens * 2,
+                high=num_tokens * 3)
+            self.assertLess(res, 1.)
+            res = quax.optimal_interval(
+                num_tokens=num_tokens,
+                low=num_tokens // 2,
+                high=num_tokens * 2)
+            self.assertEqual(res, 1.)
+
+        num_tokens = len((
+            "Das ist ein Beispielsatz mit optimaler Länge von über 10 Tokens."
+        ).split(" "))
+        result2 = quax.optimal_interval(num_tokens=num_tokens)
         self.assertEqual(result2, 1.)
-        result3 = optimal_interval('Viel zu kurz.')
+
+        num_tokens = len('Viel zu kurz.'.split(" "))
+        result3 = quax.optimal_interval(num_tokens=num_tokens)
         self.assertEqual(result3, 0.)
-        result4 = optimal_interval('Dieser hingegen ist leider zu lang. Das macht ihn weniger angenehm zu lesen. Daher ist der zurückgegebene Wert kleiner als 1, schade.')
+
+        num_tokens = len((
+            "Dieser hingegen ist leider zu lang. Das macht ihn weniger "
+            "angenehm zu lesen. Daher ist der zurückgegebene Wert kleiner "
+            "als 1, schade.").split(" "))
+        result4 = quax.optimal_interval(num_tokens=num_tokens)
         self.assertLess(result4, 1.)
