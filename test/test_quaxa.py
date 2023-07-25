@@ -1,5 +1,5 @@
 import unittest
-import quax
+import quaxa
 
 
 SENTS = [
@@ -472,7 +472,7 @@ class QuaxTester(unittest.TestCase):
             for tok in annot:
                 if tok.get('upos', '') in {'NOUN', 'VERB', 'ADJ'}:
                     headword = tok['lemma']
-                    factor = quax.total_score(
+                    factor = quaxa.total_score(
                         headword=headword, txt=txt, annotation=annot)
                     print((
                         "total_score:"
@@ -485,7 +485,7 @@ class QuaxTester(unittest.TestCase):
             for tok in annot:
                 if tok.get('upos', '') in {'NOUN', 'VERB', 'ADJ'}:
                     headword = tok['lemma']
-                    flag = quax.isa_knockout_criteria(
+                    flag = quaxa.isa_knockout_criteria(
                         headword=headword, txt=txt, annotation=annot)
                     print((
                         "isa_knockout_criteria:"
@@ -497,7 +497,7 @@ class QuaxTester(unittest.TestCase):
             for tok in annot:
                 if tok.get('upos', '') in {'NOUN', 'VERB', 'ADJ'}:
                     headword = tok['lemma']
-                    factor = quax.factor_gradual_criteria(
+                    factor = quaxa.factor_gradual_criteria(
                         headword=headword, txt=txt, annotation=annot)
                     print((
                         "factor_gradual_criteria:"
@@ -508,38 +508,38 @@ class QuaxTester(unittest.TestCase):
     def test_has_finite_verb_and_subject(self):
         target = [True, True, False]
         for i, annot in enumerate(self.annots):
-            res = quax.has_finite_verb_and_subject(annot)
+            res = quaxa.has_finite_verb_and_subject(annot)
             self.assertEqual(res, target[i])
 
     def test_is_misparsed(self):
         for sent in self.sents:
-            res = quax.is_misparsed(sent)
+            res = quaxa.is_misparsed(sent)
             self.assertFalse(res)
 
-        res = quax.is_misparsed('Das ist ein Beispieltext.')
+        res = quaxa.is_misparsed('Das ist ein Beispieltext.')
         self.assertFalse(res)
 
-        res = quax.is_misparsed('Das ist ein Beispieltext')
+        res = quaxa.is_misparsed('Das ist ein Beispieltext')
         self.assertTrue(res)
 
-        res = quax.is_misparsed('das ist ein Beispieltext.')
+        res = quaxa.is_misparsed('das ist ein Beispieltext.')
         self.assertTrue(res)
 
-        res = quax.is_misparsed('\tDas ist ein Beispieltext.')
+        res = quaxa.is_misparsed('\tDas ist ein Beispieltext.')
         self.assertTrue(res)
 
     def test_has_illegal_chars(self):
         for sent in self.sents:
-            res = quax.has_illegal_chars(sent)
+            res = quaxa.has_illegal_chars(sent)
             self.assertFalse(res)
 
-        res = quax.has_illegal_chars('https://somerandomurl.com')
+        res = quaxa.has_illegal_chars('https://somerandomurl.com')
         self.assertTrue(res)
 
-        res = quax.has_illegal_chars('name@mail.com')
+        res = quaxa.has_illegal_chars('name@mail.com')
         self.assertTrue(res)
 
-        res = quax.has_illegal_chars('my test\rnew windows paragraph')
+        res = quaxa.has_illegal_chars('my test\rnew windows paragraph')
         self.assertTrue(res)
 
     def test_has_blacklist_words(self):
@@ -547,36 +547,36 @@ class QuaxTester(unittest.TestCase):
             lemmas = [tok.get('lemma') for tok in annot]
             for tok in annot:
                 headword = tok['lemma']
-                res = quax.has_blacklist_words(
+                res = quaxa.has_blacklist_words(
                     headword=headword, lemmas=lemmas)
                 self.assertFalse(res)
 
-        res = quax.has_blacklist_words('Beispielsatz', [
+        res = quaxa.has_blacklist_words('Beispielsatz', [
             'und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
         self.assertTrue(res)
 
-        res = quax.has_blacklist_words('Idiot', [
+        res = quaxa.has_blacklist_words('Idiot', [
             'und', 'der', 'sein', 'ein', 'Beispielsatz', 'mit', 'Idiot', '--'])
         self.assertFalse(res)
 
     def test_factor_graylist_rarechars(self):
         target = [0.9, 0.9, 0.8]
         for i, sent in enumerate(self.sents):
-            res = quax.factor_rarechars(sent)
+            res = quaxa.factor_rarechars(sent)
             self.assertEqual(res, target[i])
 
-        res = quax.factor_rarechars("\'\'..??")
+        res = quaxa.factor_rarechars("\'\'..??")
         self.assertAlmostEqual(res, 0.4)  # rounding error
 
     def test_factor_graylist_notkeyboardchar(self):
         for sent in self.sents:
-            res = quax.factor_notkeyboardchar(sent)
+            res = quaxa.factor_notkeyboardchar(sent)
             self.assertEqual(res, 1.)
 
-        res = quax.factor_notkeyboardchar('ßÄÖÜäöü')
+        res = quaxa.factor_notkeyboardchar('ßÄÖÜäöü')
         self.assertEqual(res, 1.)
 
-        res = quax.factor_notkeyboardchar(
+        res = quaxa.factor_notkeyboardchar(
             'À la carte, s\'il vous plaît\n')
         self.assertLess(res, 1.0)
 
@@ -587,7 +587,7 @@ class QuaxTester(unittest.TestCase):
             lemmas = [tok.get('lemma') for tok in annot]
             for tok in annot:
                 headword = tok['lemma']
-                res = quax.factor_graylist_words(
+                res = quaxa.factor_graylist_words(
                     headword=headword, lemmas=lemmas, graylist_words=GRAYLIST)
                 if headword in GRAYLIST:
                     self.assertEqual(res, target[i] + 0.1)
@@ -598,7 +598,7 @@ class QuaxTester(unittest.TestCase):
         for annot in self.annots:
             for tok in annot:
                 headword = tok['lemma']
-                res = quax.factor_named_entity(
+                res = quaxa.factor_named_entity(
                     headword=headword, annotation=annot, penalty_factor=0.15)
                 flag = tok.get('upos', '') == 'PROPN'
                 flag = flag or tok.get('xpos', '') == 'NE'
@@ -609,12 +609,12 @@ class QuaxTester(unittest.TestCase):
 
     def test_deixis(self):
         lemmas = ['heute', 'hier', '--', 'morgen', 'dort', '--']
-        result2 = [quax.deixis_space('heute', lemmas),
-                   quax.deixis_time('heute', lemmas)]
+        result2 = [quaxa.deixis_space('heute', lemmas),
+                   quaxa.deixis_time('heute', lemmas)]
         self.assertEqual(result2, [.8, .9])
 
-        result3 = [quax.deixis_space('hier', lemmas),
-                   quax.deixis_time('hier', lemmas)]
+        result3 = [quaxa.deixis_space('hier', lemmas),
+                   quaxa.deixis_time('hier', lemmas)]
         self.assertEqual(result3, [.9, .8])
 
     def test_deixis_person(self):
@@ -622,7 +622,7 @@ class QuaxTester(unittest.TestCase):
         for i, annot in enumerate(self.annots):
             for tok in annot:
                 headword = tok['lemma']
-                res = quax.deixis_person(
+                res = quaxa.deixis_person(
                     headword=headword, annotation=annot)
                 flag = tok.get('upos', '') == 'PRON'
                 flag = flag and tok.get('feats', {}).get('PronType', '') in [
@@ -635,12 +635,12 @@ class QuaxTester(unittest.TestCase):
     def test_optimal_interval(self):
         for annot in self.annots:
             num_tokens = len(annot)
-            res = quax.optimal_interval(
+            res = quaxa.optimal_interval(
                 num_tokens=num_tokens,
                 low=num_tokens * 2,
                 high=num_tokens * 3)
             self.assertLess(res, 1.)
-            res = quax.optimal_interval(
+            res = quaxa.optimal_interval(
                 num_tokens=num_tokens,
                 low=num_tokens // 2,
                 high=num_tokens * 2)
@@ -649,16 +649,16 @@ class QuaxTester(unittest.TestCase):
         num_tokens = len((
             "Das ist ein Beispielsatz mit optimaler Länge von über 10 Tokens."
         ).split(" "))
-        result2 = quax.optimal_interval(num_tokens=num_tokens)
+        result2 = quaxa.optimal_interval(num_tokens=num_tokens)
         self.assertEqual(result2, 1.)
 
         num_tokens = len('Viel zu kurz.'.split(" "))
-        result3 = quax.optimal_interval(num_tokens=num_tokens)
+        result3 = quaxa.optimal_interval(num_tokens=num_tokens)
         self.assertEqual(result3, 0.)
 
         num_tokens = len((
             "Dieser hingegen ist leider zu lang. Das macht ihn weniger "
             "angenehm zu lesen. Daher ist der zurückgegebene Wert kleiner "
             "als 1, schade.").split(" "))
-        result4 = quax.optimal_interval(num_tokens=num_tokens)
+        result4 = quaxa.optimal_interval(num_tokens=num_tokens)
         self.assertLess(result4, 1.)

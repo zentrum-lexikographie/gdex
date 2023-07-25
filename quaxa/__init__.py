@@ -1,6 +1,6 @@
 __version__ = '0.1.0'
 
-from .quax import (
+from .quaxa import (
     total_score,
     isa_knockout_criteria,
     factor_gradual_criteria,
