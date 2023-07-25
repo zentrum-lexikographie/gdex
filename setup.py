@@ -19,15 +19,16 @@ def get_version(path):
 
 
 setuptools.setup(
-    name='quax',
-    version=get_version("quax/__init__.py"),
-    description='QUAlity of sentence eXamples scoring',
-    long_description=read('README.rst'),
-    url='http://github.com/ulf1/quax',
+    name='quaxa',
+    version=get_version("quaxa/__init__.py"),
+    description='QUAlity of sentence eXAmples scoring',
+    long_description=read('README.md'),
+    long_description_content_type='text/markdown',
+    url='http://github.com/ulf1/quaxa',
     author='Ulf Hamster',
     author_email='554c46@gmail.com',
     license='Apache License 2.0',
-    packages=['quax'],
+    packages=['quaxa'],
     install_requires=[
         "conllu>=4.5.3"
     ],

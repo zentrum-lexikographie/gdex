@@ -1,5 +1,5 @@
-[![PyPI version](https://badge.fury.io/py/quax.svg)](https://badge.fury.io/py/quax)
-[![PyPi downloads](https://img.shields.io/pypi/dm/quax)](https://img.shields.io/pypi/dm/quax)
+[![PyPI version](https://badge.fury.io/py/quaxa.svg)](https://badge.fury.io/py/quaxa)
+[![PyPi downloads](https://img.shields.io/pypi/dm/quaxa)](https://img.shields.io/pypi/dm/quaxa)
 
 # QUAX: QUAlity of sentence eXamples scoring
 Rule-based sentence scoring algorithm based on GDEX.
@@ -50,11 +50,11 @@ Quellen:
 ## Appendix
 
 ### Installation
-The `quax` [git repo](http://github.com/ulf1/quax) is available as [PyPi package](https://pypi.org/project/quax)
+The `quaxa` [git repo](http://github.com/ulf1/quaxa) is available as [PyPi package](https://pypi.org/project/quaxa)
 
 ```sh
-pip install quax
-pip install git+ssh://git@github.com/ulf1/quax.git
+pip install quaxa
+pip install git+ssh://git@github.com/ulf1/quaxa.git
 ```
 
 ### Install a virtual environment
@@ -93,11 +93,11 @@ rm -r .venv
 
 
 ### Support
-Please [open an issue](https://github.com/ulf1/quax/issues/new) for support.
+Please [open an issue](https://github.com/ulf1/quaxa/issues/new) for support.
 
 
 ### Contributing
-Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/ulf1/quax/compare/).
+Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/ulf1/quaxa/compare/).
 
 
 ### Acknowledgements
