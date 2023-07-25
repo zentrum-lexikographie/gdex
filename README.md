@@ -7,9 +7,32 @@ Rule-based sentence scoring algorithm based on GDEX.
 
 ## Rules
 
+### Formel
+
+```
+score = 0.5 * isnoknockout + 0.5 * gesamtfaktor
+```
+
+### Knock-out Kritieren
+Wenn 1 Knock-out Kriterium identifiziert wird, dann wird direkt der Score direkt um 0.5 (von 1.0) gesenkt.
 
 | Funktion | Ausgabe | Beschreibung | Hinweis |
 |:---:|:---:|:---|:---|
+| `has_finite_verb_and_subject` | bool | Der Satz hat ein finites Verb und ein Subjekt, wovon eines Root des Dependenzbaum ist oder via beide über Root Node verknüpft sind. | [1] GDEX whole sentence |
+| `is_misparsed` | bool | Das 1. Zeichen des Strings ist kleingeschrieben, ein Leerzeichen oder eine Punktuation; oder das letzte Zeichen ist keine Punktuation. | [1] GDEX whole sentence |
+| `has_illegal_chars` | bool | String enhält Kontrolzeichen (ASCII 0-31), oder die Zeichen `<>|[]/\^@'` (z.B. HTML Tags, Markdown Hyperlinks, Dateipfade, E-Mail, u.a.) | [1] GDEX illegal chars |
+| `has_blacklist_words` | bool | Satzbeleg enthält Wörter, sodass in keinem Fall der Satzbeleg als Wörterbuchbeispiel in Betracht gezogen wird; ausgenommen das Blacklist-Wort ist selbt der Wörterbucheintrag. (dt. Blacklist ist voreingestellt) | [1] GDEX blacklist |
+
+### Diskontierungsfakoren
+Je Kriterium wird ein Faktor berechnet, und alle Faktoren miteinander multipliziert. 
+Wenn bspw. ein Faktor eine Penality von 0.1 bekommt, dann ist der Faktor 0.9.
+Für den Gesamtscore wird der Gesamtfaktor mit 0.5 multipliziert.
+
+| Funktion | Ausgabe | Beschreibung | Hinweis |
+|:---:|:---:|:---|:---|
+| `factor_rarechars` | [0.0, 1.0] | Strafe für jedes Zeichen, was `0123456789\'.,!?)(;:-` ist (Zahlen bzw. lange Zahlen; `.` für Abk.; mehrere Punktuationen; Bindestrichwörter, u.a.) | [1] GDEX rare chars |
+| `factor_notkeyboardchar` | [0.0, 1.0] | Der Prozentsatz der Zeichen, die mit einem deutsche Tastaturlayout getippt werden können. | n.a. |
+| `factor_graylist_words` | [0.0, 1.0] | Strafe Satzbelege ab, wenn Lemma auf einer Graylist steht; ausgenommen das Graylist-Wort ist selbt der Wörterbucheintrag. (Default: Keine Graylist voreingestellt) | [1] GDEX greylist |
 | `factor_named_entity` | [1.0 - penalty, 1.0] | Strafe Satzbeleg ab, wenn Lemma ein o. Teil eines Eigennamen ist | [1] GDEX upper case (rare chars), [2] GBEX NE |
 | `deixis_time` | [0.0, 1.0] | Strafe Signalwörter für Temporaldeixis ab. | [2] GBEX Dexis; [3] |
 | `deixis_space` | [0.0, 1.0] | Strafe Signalwörter für Lokaldeixis ab. | [2] GBEX Dexis; [3] |
