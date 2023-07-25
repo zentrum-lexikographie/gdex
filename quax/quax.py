@@ -27,6 +27,7 @@ def isa_knockout_criteria(**kwargs):
     headword = kwargs.get('headword')
     txt = kwargs.get('txt')
     annotation = kwargs.get('annotation')
+    blacklist = kwargs.get('blacklist')  # optional
     # prepare variables
     lemmas = [t.get('lemma') for t in annotation]
     # compute factor
@@ -36,7 +37,7 @@ def isa_knockout_criteria(**kwargs):
         return False
     if has_illegal_chars(txt):
         return False
-    if has_blacklist_words(txt, headword, lemmas):
+    if has_blacklist_words(headword, lemmas, blacklist_words=blacklist):
         return False
     return True
 
@@ -46,7 +47,7 @@ def factor_gradual_criteria(**kwargs):
     headword = kwargs.get('headword')
     txt = kwargs.get('txt')
     annotation = kwargs.get('annotation')
-    graylist = kwargs.get('graylist', [])  # optional
+    graylist = kwargs.get('graylist')  # optional
     # prepare variables
     lemmas = [t.get('lemma') for t in annotation]
     num_tokens = len(annotation)
@@ -218,6 +219,8 @@ BLACKLIST_WORDS_DE = [
 def has_blacklist_words(headword: str,
                         lemmas: List[str],
                         blacklist_words: List[str] = BLACKLIST_WORDS_DE):
+    if blacklist_words is None:
+        blacklist_words = BLACKLIST_WORDS_DE
     a = set(lemmas)
     b = set([w for w in blacklist_words if w != headword])
     return len(a.intersection(b)) > 0
@@ -299,6 +302,8 @@ def factor_graylist_words(headword: str,
                           graylist_words: List[str],
                           penalty_factor: float = 0.1):
     """Penalize graylist words"""
+    if graylist_words is None:
+        return 1.0   # no default list
     num_matches = len([
         lem for lem in lemmas
         if lem != headword and lem in graylist_words])
