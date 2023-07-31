@@ -8,9 +8,9 @@ def parse_conllu(corpus: List[conllu.models.TokenList]) -> List[dict]:
     Usage:
     ------
     >>> import conllu
-    >>> import quax
+    >>> import quaxa
     >>> corpus = conllu.parse(open('myfile.conllu', 'r').read())
-    >>> sents, annot = quax.parse_conllu(corpus)
+    >>> sents, annot = quaxa.parse_conllu(corpus)
     """
 
     # process each sentence of a corpus
