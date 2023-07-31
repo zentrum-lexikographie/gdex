@@ -1,5 +1,3 @@
-# https://github.com/UniversalDependencies/UD_German-GSD/blob/master/de_gsd-ud-test.conllu
-
 # sent_id = test-s20
 # text = An den anderen Tischen sah es nicht besser aus.
 1	An	an	ADP	APPR	_	4	case	_	_
