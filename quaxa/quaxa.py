@@ -97,7 +97,8 @@ def has_finite_verb_and_subject(annotation: List[dict]) -> bool:
     """
     # find the root of the dependency tree
     root = [token for token in annotation if token['deprel'].lower() == 'root']
-    assert len(root) == 1
+    if len(root) != 1:
+        return False
     root = root[0]
     root_id = root['id']
 
