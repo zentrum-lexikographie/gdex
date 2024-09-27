@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quaxa"
+version = "0.1.1"
+description = "QUAlity of sentence eXAmples scoring"
+authors = [
+    {name = "Ulf Hamster", email = "554c46@gmail.com"},
+    {name = "Gregor Middell", email = "gregor.middell@bbaw.de"}
+]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Topic :: Education",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Text Processing :: Linguistic"
+]
+requires-python = ">=3.7"
+dependencies = ["spacy>=3.7"]
+dynamic = ["readme"]
+
+[project.optional-dependencies]
+dev = [
+    "coverage",
+    "flake8",
+    "flake8-bugbear",
+    "mypy",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "de-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.7.0/de_core_news_sm-3.7.0-py3-none-any.whl#sha256=d88c737eb7eb766f730f6a2dcb99dfcdb81623e1e0d89a9c638a2182ac19c52e"
+]
+
+[project.urls]
+Homepage = "https://github.com/ulf1/quaxa"
+
+[tool.isort]
+profile = "black"
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
+
+[tool.setuptools.packages.find]
+exclude = ["tests"]
+
+[tool.setuptools.package-data]
+"quaxa" = ["de_whitelist.txt", "VulGer.csv"]
