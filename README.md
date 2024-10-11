@@ -1,109 +1,91 @@
-[![PyPI version](https://badge.fury.io/py/quaxa.svg)](https://badge.fury.io/py/quaxa)
-[![PyPi downloads](https://img.shields.io/pypi/dm/quaxa)](https://img.shields.io/pypi/dm/quaxa)
-[![DOI](https://zenodo.org/badge/667310199.svg)](https://zenodo.org/badge/latestdoi/667310199)
+# quaxa - QUAlity of sentence eXAmples
 
-# QUAXA: QUAlity of sentence eXAmples scoring
-Rule-based sentence scoring algorithm based on GDEX.
+_Rule-based sentence scoring algorithm based on GDEX_
 
+This package provides a
+[GDEX](https://www.sketchengine.eu/guide/gdex/)-based algorithm for
+evaluating sentences with regard to their suitability as good examples
+in dictionaries. It applies a numeric score between zero and one to
+sentences which have been preprocessed with the NLP tool
+[spaCy](https://spacy.io/). The score is computed by taking several
+configurable criteria into account, firstly knock-out criteria which
+have to be fulfilled in order to reach a score above zero at all, as
+well as gradual criteria that factor into a score greater than zero.
 
-## Rules
+Among the knock-out criteria are
 
-### Formel
+* the character set of a sentence not containing any invalid ones (i. e. control characters),
+* properly parsed sentences with punctuation at the end, and
+* the existence of a finite verb and a subject, annotated and related
+  in a sentence's dependency parse tree.
 
-```
-score = 0.5 * isnoknockout + 0.5 * gesamtfaktor
-```
+Among the gradual criteria are
 
-### Knock-out Kritieren
-Wenn 1 Knock-out Kriterium identifiziert wird, dann wird direkt der Score direkt um 0.5 (von 1.0) gesenkt.
+* the absence of blacklisted words (i. e. vulgar or obscene),
+* the absence of rare characters or those normally not available on a keyboard,
+* the absence of named entities,
+* the absence of deictic expressions,
+* an optimal length of the sentence, and
+* a whitelist-based coverage test, i. e. for penalizing usage of rare lemmata.
 
-| Funktion | Ausgabe | Beschreibung | Hinweis |
-|:---:|:---:|:---|:---|
-| `has_finite_verb_and_subject` | bool | Der Satz hat ein finites Verb und ein Subjekt, wovon eines Root des Dependenzbaum ist oder via beide über Root Node verknüpft sind. | [1] GDEX whole sentence |
-| `is_misparsed` | bool | Das 1. Zeichen des Strings ist kleingeschrieben, ein Leerzeichen oder eine Punktuation; oder das letzte Zeichen ist keine Punktuation. | [1] GDEX whole sentence |
-| `has_illegal_chars` | bool | String enhält Kontrolzeichen (ASCII 0-31), oder die Zeichen `<>|[]/\^@'` (z.B. HTML Tags, Markdown Hyperlinks, Dateipfade, E-Mail, u.a.) | [1] GDEX illegal chars |
-| `has_blacklist_words` | bool | Satzbeleg enthält Wörter, sodass in keinem Fall der Satzbeleg als Wörterbuchbeispiel in Betracht gezogen wird; ausgenommen das Blacklist-Wort ist selbt der Wörterbucheintrag. (dt. Blacklist ist voreingestellt) | [1] GDEX blacklist |
+## Installation
 
-### Diskontierungsfakoren
-Je Kriterium wird ein Faktor berechnet, und alle Faktoren miteinander multipliziert. 
-Wenn bspw. ein Faktor eine Penality von 0.1 bekommt, dann ist der Faktor 0.9.
-Für den Gesamtscore wird der Gesamtfaktor mit 0.5 multipliziert.
-
-| Funktion | Ausgabe | Beschreibung | Hinweis |
-|:---:|:---:|:---|:---|
-| `factor_rarechars` | [0.0, 1.0] | Strafe für jedes Zeichen, was `0123456789\'.,!?)(;:-` ist (Zahlen bzw. lange Zahlen; `.` für Abk.; mehrere Punktuationen; Bindestrichwörter, u.a.) | [1] GDEX rare chars |
-| `factor_notkeyboardchar` | [0.0, 1.0] | Der Prozentsatz der Zeichen, die mit einem deutsche Tastaturlayout getippt werden können. | n.a. |
-| `factor_graylist_words` | [0.0, 1.0] | Strafe Satzbelege ab, wenn Lemma auf einer Graylist steht; ausgenommen das Graylist-Wort ist selbt der Wörterbucheintrag. (Default: Keine Graylist voreingestellt) | [1] GDEX greylist |
-| `factor_named_entity` | [1.0 - penalty, 1.0] | Strafe Satzbeleg ab, wenn Lemma ein o. Teil eines Eigennamen ist | [1] GDEX upper case (rare chars), [2] GBEX NE |
-| `deixis_time` | [0.0, 1.0] | Strafe Signalwörter für Temporaldeixis ab. | [2] GBEX Dexis; [3] |
-| `deixis_space` | [0.0, 1.0] | Strafe Signalwörter für Lokaldeixis ab. | [2] GBEX Dexis; [3] |
-| `deixis_person` | [0.0, 1.0] | Strafe Wörter mit `UPOS=PRON` und `PronType=Prs|Dem|Ind|Neg|Tot` ab. Entspricht STTS PoS-Tags `PDS` (`PRON` + `Dem`, z.B, das, dies, die, diese, der), `PIS` (`PRON` + `Ind|Neg|Tot`, z.B, man, allem, nichts, alles, mehr), `PPER` (`PRON` + `Prs`, z.B, es, sie, er, wir, ich), `PPOSS` (`PRON` + `Prs`, z.B, ihren, Seinen, seinem, unsrigen, meiner). | [1] GDEX graylist PoS- Tags, [2] GBEX Dexis; [3], [4] |
-| `optimal_interval` | [0.0, 1.0] | Strafe Satzbelege mit zu wenigen/vielen Wörter ab ab. | [1] GDEX |
-
-
-Quellen:
-- [1] Lexical Computing, "GDEX configuration introduction", URL: https://www.sketchengine.eu/syntax-of-gdex-configuration-files/
-- [2] Didakowski, Lemnitzer, Geyken, 2012, "Automatic example sentence ex- traction for a contemporary German dictionary", URL: https://euralex.org/publications/automatic-example-sentence-extraction-for-a-contemporary-german-dictionary/
-- [3] LingTermNet, URL: https://gsw.phil-fak.uni-duesseldorf.de/diskurslinguistik/index.php?title=Deiktischer_Ausdruck
-- [4] Universial Dependency, UPOS-STTS conversion table, URL: https://universaldependencies.org/tagset-conversion/de-stts-uposf.html
-
-
-## Appendix
-
-### Installation
-The `quaxa` [git repo](http://github.com/ulf1/quaxa) is available as [PyPi package](https://pypi.org/project/quaxa)
+`quaxa` can be installed as a package from its GitHub source repository:
 
 ```sh
-pip install quaxa
-pip install git+ssh://git@github.com/ulf1/quaxa.git
+pip install git+https://github.com/zentrum-lexikographie/quaxa.git
 ```
 
-### Install a virtual environment
+For development, clone it from GitHub and install it locally, including optional dependencies:
 
-```sh
-python3 -m venv .venv
-source .venv/bin/activate
-pip install --upgrade pip
-pip install -r requirements.txt --no-cache-dir
-pip install -r requirements-dev.txt --no-cache-dir
+``` sh
+pip install -e .[dev]
 ```
 
-(If your git repo is stored in a folder with whitespaces, then don't use the subfolder `.venv`. Use an absolute path without whitespaces.)
+## Usage
 
-### Python commands
 
-* Jupyter for the examples: `jupyter lab`
-* Check syntax: `flake8 --ignore=F401 --exclude=$(grep -v '^#' .gitignore | xargs | sed -e 's/ /,/g')`
-* Run Unit Tests: `PYTHONPATH=. python -m unittest`
-
-Publish
-
-```sh
-python setup.py sdist 
-twine upload -r pypi dist/*
+``` python-console
+>>> import spacy, quaxa
+>>> nlp = spacy.load("de_core_news_sm")
+>>> [s._.quaxa for s in quaxa.de_core(nlp("Achtung! Das ist ein toller Test.")).sents]
+[0.0, 0.5966]
 ```
 
-### Clean up 
+## Testing
 
-```sh
-find . -type f -name "*.pyc" | xargs rm
-find . -type d -name "__pycache__" | xargs rm -r
-rm -r .pytest_cache
-rm -r .venv
+Run tests, including calculation of code coverage:
+
+``` sh
+pytest --cov=quaxa
 ```
 
+## Acknowledgements
 
-### Support
-Please [open an issue](https://github.com/ulf1/quaxa/issues/new) for support.
+This package was initially developed as part of the [EVIDENCE
+project](https://gepris.dfg.de/gepris/projekt/433249742) and funded by
+the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation,
+GU 798/27-1; GE 1119/11-1). Between August 2023 and October 2024, it
+has been maintained by [Ulf Hamster](https://github.com/ulf1/).
 
+Quaxa makes use of [VulGer](https://aclanthology.org/W19-3513), a
+lexicon covering words from the lower end of the German language
+register — terms typically considered rough, vulgar, or
+obscene. VulGer is used under the terms of the CC-BY-SA license.
 
-### Contributing
-Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/ulf1/quaxa/compare/).
+## Bibliography
 
-
-### Acknowledgements
-The "Evidence" project was funded by the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) - [433249742](https://gepris.dfg.de/gepris/projekt/433249742) (GU 798/27-1; GE 1119/11-1).
-
-### Maintenance
-- till 31.Aug.2023 (v0.1.0) the code repository was maintained within the DFG project [433249742](https://gepris.dfg.de/gepris/projekt/433249742)
-- since 01.Sep.2023 (v0.1.0) the code repository is maintained by Ulf Hamster.
+* Adam Kilgarriff, Miloš Husák, Katy McAdam, Michael Rundell and Pavel
+  Rychlý. [GDEX: Automatically finding good dictionary examples in a
+  corpus](http://www.sketchengine.co.uk/wp-content/uploads/2015/05/GDEX_Automatically_finding_2008.pdf).
+  In Proceedings of the 13th EURALEX International Congress. Spain,
+  July 2008, pp. 425–432.
+* Didakowski, Jörg, Lothar Lemnitzer, and Alexander Geyken. [Automatic
+  example sentence extraction for a contemporary German
+  dictionary](https://euralex.org/publications/automatic-example-sentence-extraction-for-a-contemporary-german-dictionary/). Proceedings
+  EURALEX. 2012.
+* Elisabeth Eder, Ulrike Krieg-Holz, and Udo Hahn. 2019. [At the Lower
+  End of Language—Exploring the Vulgar and Obscene Side of
+  German.](https://aclanthology.org/W19-3513) In Proceedings of the
+  Third Workshop on Abusive Language Online, pages 119–128, Florence,
+  Italy. Association for Computational Linguistics.

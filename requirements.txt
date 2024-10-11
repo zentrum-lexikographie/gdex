@@ -1,2 +1,0 @@
-# public packages (see setup.py)
-conllu>=4.5.3
