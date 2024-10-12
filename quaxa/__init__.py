@@ -39,7 +39,7 @@ class SentenceScorer:
     penalty_deixis: float = 0.034
 
     def score_sentence(self, sent: Span, headword=None) -> float:
-        score = 0.5 * self.has_a_knockout_criterion(sent)
+        score = 0.5 * self.has_no_knockout_criterion(sent)
         score += 0.5 * self.factor_gradual_criteria(sent, headword)
         return score
 
@@ -48,7 +48,7 @@ class SentenceScorer:
             sent._.quaxa = self.score_sentence(sent, headword)
         return doc
 
-    def has_a_knockout_criterion(self, sent):
+    def has_no_knockout_criterion(self, sent):
         if self.has_illegal_chars(sent):
             return False
         if self.is_misparsed(sent):
