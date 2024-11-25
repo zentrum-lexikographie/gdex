@@ -2,29 +2,32 @@ import spacy
 
 import quaxa
 
-nlp = spacy.load("de_core_news_sm")
+de_core_nlp = spacy.load("de_core_news_sm")
+de_hdt_nlp = spacy.load("de_hdt_lg")
 
 
-def score(s):
-    return quaxa.de_core(nlp(s))
+def scores(s):
+    return (quaxa.de_core(de_core_nlp(s)), quaxa.de_hdt(de_hdt_nlp(s)))
 
 
 def assert_knockout(s):
-    for sent in score(s).sents:
-        assert sent._.quaxa <= 0.5
+    for doc in scores(s):
+        for sent in doc.sents:
+            assert sent._.quaxa <= 0.5
 
 
 def assert_penalty(factor_method, s, headword=None):
-    doc = nlp(s)
-    for sent in doc.sents:
-        if headword is not None:
-            assert factor_method(quaxa.de_core, sent, headword) < 1.0
-        else:
-            assert factor_method(quaxa.de_core, sent) < 1.0
+    for nlp, scorer in ((de_core_nlp, quaxa.de_core), (de_hdt_nlp, quaxa.de_hdt)):
+        doc = nlp(s)
+        for sent in doc.sents:
+            if headword is not None:
+                assert factor_method(scorer, sent, headword) < 1.0
+            else:
+                assert factor_method(scorer, sent) < 1.0
 
 
 def test_scoring():
-    doc = score(
+    docs = scores(
         " ".join(
             (
                 "Manasse ist ein einzigartiger Parfümeur.",
@@ -36,8 +39,9 @@ def test_scoring():
             )
         )
     )
-    for sent in doc.sents:
-        assert sent._.quaxa >= 0.0 and sent._.quaxa <= 1.0
+    for doc in docs:
+        for sent in doc.sents:
+            assert sent._.quaxa >= 0.0 and sent._.quaxa <= 1.0
 
 
 def test_illegal_chars():

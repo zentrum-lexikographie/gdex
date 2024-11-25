@@ -46,10 +46,11 @@ pip install -e .[dev]
 
 
 ``` python-console
->>> import spacy, quaxa
+>>> import spacy
+>>> import quaxa
 >>> nlp = spacy.load("de_core_news_sm")
 >>> [s._.quaxa for s in quaxa.de_core(nlp("Achtung! Das ist ein toller Test.")).sents]
-[0.0, 0.5966]
+[0.0, 0.5322]
 ```
 
 ## Testing
@@ -57,7 +58,7 @@ pip install -e .[dev]
 Run tests, including calculation of code coverage:
 
 ``` sh
-pytest --cov=quaxa
+coverage run -m pytest
 ```
 
 ## Acknowledgements

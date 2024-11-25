@@ -26,6 +26,7 @@ class SentenceScorer:
     has_finite_verb_and_subject: Callable[[Span], bool] = lambda sent: True
     is_misparsed: Callable[[Span], bool] = lambda sent: False
     is_deixis: Callable[[Token], bool] = lambda token: False
+    num_entities: Callable[[Span], int] = lambda sent: 0
 
     whitelist: Set[str] = field(default_factory=set, repr=False)
     blacklist: Set[str] = field(default_factory=set, repr=False)
@@ -93,7 +94,7 @@ class SentenceScorer:
         return sum((1 for c in txt if c in self.keyboard_chars)) / len(txt)
 
     def factor_named_entities(self, sent: Span):
-        return max(0.0, 1.0 - self.penalty_named_entity * len(sent.ents))
+        return max(0.0, 1.0 - self.penalty_named_entity * self.num_entities(sent))
 
     def factor_tokens(
         self,
@@ -138,24 +139,28 @@ class SentenceScorer:
         return self.factor_tokens(sent, headword, self.is_deixis, self.penalty_deixis)
 
 
-def _de_core_has_finite_verb_and_subject(sent: Span) -> bool:
+def _de_has_finite_verb_and_subject(sent: Span) -> bool:
     for root in sent:
         if root.dep_ != "ROOT":
             continue
-        for finite_verb in [root] + list(root.children):
+        for finite_verb in (root, *root.children):
             if finite_verb.pos_ not in {"AUX", "VERB"}:
                 continue
             if "Fin" not in finite_verb.morph.get(
                 "VerbForm", []
             ) and not finite_verb.tag_.endswith("FIN"):
                 continue
-            for subject in finite_verb.children:
-                if subject.dep_ == "sb" and subject.pos_ in {"NOUN", "PROPN", "PRON"}:
+            for subject in (*finite_verb.children, *root.children):
+                if subject.dep_ in {"sb", "nsubj"} and subject.pos_ in {
+                    "NOUN",
+                    "PROPN",
+                    "PRON",
+                }:
                     return True
     return False
 
 
-def _de_core_is_misparsed(sent: Span) -> bool:
+def _de_is_misparsed(sent: Span) -> bool:
     tokens = list(sent)
 
     first_token = tokens[0]
@@ -201,17 +206,25 @@ _DE_TIME_DEIXIS_TERMS = {
 _DE_PERSON_DEIXIS_PRON_TYPES = {"Prs", "Dem", "Ind", "Neg", "Tot"}
 
 
-def _de_core_is_deixis(token: Token) -> bool:
+def _de_is_deixis(token: Token) -> bool:
     if (
         token.pos_ == "PRON"
         and token.morph.get("PronType", [""])[0] in _DE_PERSON_DEIXIS_PRON_TYPES
     ):
         return True
-    if token.lemma_ in _DE_SPACE_DEIXIS_TERMS:
+    if token.lemma_.lower() in _DE_SPACE_DEIXIS_TERMS:
         return True
-    if token.lemma_ in _DE_TIME_DEIXIS_TERMS:
+    if token.lemma_.lower() in _DE_TIME_DEIXIS_TERMS:
         return True
     return False
+
+
+def _de_core_num_entities(sent: Span):
+    return len(sent.ents)
+
+
+def _de_hdt_num_entities(sent: Span):
+    return sum((1 for t in sent if t.pos_ == "PROPN"))
 
 
 _QWERTZ_DE = set(
@@ -238,10 +251,23 @@ with _de_vulger_file.open(encoding="utf-8") as vulger:
         _de_vulger_blacklist.add(word)
 
 de_core = SentenceScorer(
-    has_finite_verb_and_subject=_de_core_has_finite_verb_and_subject,
-    is_misparsed=_de_core_is_misparsed,
-    is_deixis=_de_core_is_deixis,
+    has_finite_verb_and_subject=_de_has_finite_verb_and_subject,
+    is_misparsed=_de_is_misparsed,
+    is_deixis=_de_is_deixis,
+    num_entities=_de_core_num_entities,
     keyboard_chars=_QWERTZ_DE,
     whitelist=_de_whitelist,
     blacklist=_de_vulger_blacklist,
 )
+
+de_hdt = SentenceScorer(
+    has_finite_verb_and_subject=_de_has_finite_verb_and_subject,
+    is_misparsed=_de_is_misparsed,
+    is_deixis=_de_is_deixis,
+    num_entities=_de_hdt_num_entities,
+    keyboard_chars=_QWERTZ_DE,
+    whitelist=_de_whitelist,
+    blacklist=_de_vulger_blacklist,
+)
+
+__all__ = ["SentenceScorer", "de_core", "de_hdt"]

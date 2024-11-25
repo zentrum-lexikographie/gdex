@@ -21,4 +21,4 @@ jobs:
         pip install '.[dev]'
     - name: Run unit tests
       run: |
-        pytest --cov=quaxa
+        pytest
