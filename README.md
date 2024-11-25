@@ -1,8 +1,8 @@
-# quaxa - QUAlity of sentence eXAmples
+# gdex
 
-_Rule-based sentence scoring algorithm based on GDEX_
+_Rule-based sentence scoring algorithm_
 
-This package provides a
+This Python package provides a
 [GDEX](https://www.sketchengine.eu/guide/gdex/)-based algorithm for
 evaluating sentences with regard to their suitability as good examples
 in dictionaries. It applies a numeric score between zero and one to
@@ -30,10 +30,10 @@ Among the gradual criteria are
 
 ## Installation
 
-`quaxa` can be installed as a package from its GitHub source repository:
+`gdex` can be installed as a package from its GitHub source repository:
 
 ```sh
-pip install git+https://github.com/zentrum-lexikographie/quaxa.git
+pip install git+https://github.com/zentrum-lexikographie/gdex.git
 ```
 
 For development, clone it from GitHub and install it locally, including optional dependencies:
@@ -47,9 +47,9 @@ pip install -e .[dev]
 
 ``` python-console
 >>> import spacy
->>> import quaxa
+>>> import gdex
 >>> nlp = spacy.load("de_core_news_sm")
->>> [s._.quaxa for s in quaxa.de_core(nlp("Achtung! Das ist ein toller Test.")).sents]
+>>> [s._.gdex for s in gdex.de_core(nlp("Achtung! Das ist ein toller Test.")).sents]
 [0.0, 0.5322]
 ```
 
@@ -69,8 +69,8 @@ the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation,
 GU 798/27-1; GE 1119/11-1). Between August 2023 and October 2024, it
 has been maintained by [Ulf Hamster](https://github.com/ulf1/).
 
-Quaxa makes use of [VulGer](https://aclanthology.org/W19-3513), a
-lexicon covering words from the lower end of the German language
+This implementation makes use of [VulGer](https://aclanthology.org/W19-3513),
+a lexicon covering words from the lower end of the German language
 register — terms typically considered rough, vulgar, or
 obscene. VulGer is used under the terms of the CC-BY-SA license.
 

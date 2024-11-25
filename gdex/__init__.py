@@ -7,10 +7,12 @@ from spacy.tokens.doc import Doc
 from spacy.tokens.span import Span
 from spacy.tokens.token import Token
 
+from .version import __version__
+
 _DEFAULT_ILLEGAL_CHARS = "<>|[]/\\^@"
 _DEFAULT_RARE_CHARS = "0123456789')(-"
 
-Span.set_extension("quaxa", default=0.0)
+Span.set_extension("gdex", default=0.0)
 
 
 @dataclass
@@ -46,7 +48,7 @@ class SentenceScorer:
 
     def __call__(self, doc: Doc, headword=None) -> Doc:
         for sent in doc.sents:
-            sent._.quaxa = self.score_sentence(sent, headword)
+            sent._.gdex = self.score_sentence(sent, headword)
         return doc
 
     def has_no_knockout_criterion(self, sent):
