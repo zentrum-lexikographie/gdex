@@ -54,6 +54,17 @@ def test_misparsed():
     assert_knockout("Ein Satz ohne Satzzeichen")
     assert_knockout("ein Satz, der mit Kleinbuchstaben beginnt.")
     assert_knockout(": Ein Satz mit Interpunktion am Anfang.")
+    assert_knockout("Ein Satz, der nach einem Komma geteilt wurde,")
+    assert_knockout("Der nächste Satz gehört inhaltlich eng zu diesem:")
+    assert_knockout(
+        '"Ich hoffe, dass es mir gelungen ist, Sinnbilder unserer Zeit zu schaffen."'
+    )
+    assert_knockout(
+        (
+            'Sie "habe eine hohe Qualität: fein marmoriert, dünnwandig und '
+            'bemalt mit Ornamenten und Figuren in orange-roter Farbe."'
+        )
+    )
 
 
 def test_finite_verb_and_subject():
