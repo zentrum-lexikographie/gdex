@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.0.1...v1.1.0) (2024-12-19)
+
+
+### Features
+
+* Define valid sentence endings more strictly ([04e128a](https://github.com/zentrum-lexikographie/gdex/commit/04e128a73f6f1aa658588d8798c4d3b8cf3b418c))
+
 ## [1.0.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.0.0...v1.0.1) (2024-11-25)
 
 
