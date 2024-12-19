@@ -54,6 +54,15 @@ def test_misparsed():
     assert_knockout("Ein Satz ohne Satzzeichen")
     assert_knockout("ein Satz, der mit Kleinbuchstaben beginnt.")
     assert_knockout(": Ein Satz mit Interpunktion am Anfang.")
+    assert_knockout("Ein Satz, der nach einem Komma geteilt wurde,")
+    assert_knockout("Der nächste Satz gehört inhaltlich eng zu diesem:")
+    assert_knockout(
+        (
+            '"Durch das Kriterium werden auch alle Sätze, die mit '
+            'Anführungszeichen beginnen und/oder enden, ausgeschlossen."'
+        )
+    )
+    assert_knockout('Die Kulisse habe "eine malerische Qualität."')
 
 
 def test_finite_verb_and_subject():

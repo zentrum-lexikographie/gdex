@@ -174,7 +174,10 @@ def _de_is_misparsed(sent: Span) -> bool:
         return True
 
     last_token = tokens[-1]
-    if last_token.pos_ != "PUNCT":
+    if last_token.text not in {".", "?", "!"}:
+        return True
+
+    if (sum((1 for t in tokens if t.tag_ == "$(")) % 2) != 0:
         return True
 
     return False
