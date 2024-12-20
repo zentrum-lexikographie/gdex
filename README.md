@@ -9,8 +9,8 @@ in dictionaries. It applies a numeric score between zero and one to
 sentences which have been preprocessed with the NLP tool
 [spaCy](https://spacy.io/). The score is computed by taking several
 configurable criteria into account, firstly knock-out criteria which
-have to be fulfilled in order to reach a score above zero at all, as
-well as gradual criteria that factor into a score greater than zero.
+have to be fulfilled in order to reach a score above 0.5, as well as
+gradual criteria that factor into a score.
 
 Among the knock-out criteria are
 
