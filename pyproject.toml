@@ -7,7 +7,7 @@ name = "gdex"
 description = "Rule-based sentence scoring algorithm"
 authors = [
     {name = "Ulf Hamster", email = "554c46@gmail.com"},
-    {name = "Gregor Middell", email = "gregor.middell@bbaw.de"}
+    {name = "Gregor Middell", email = "gregor.middell@bbaw.de"},
     {name = "Natalie Sürmeli", email = "natalie.suermeli@uni-potsdam.de"}
 ]
 classifiers = [
