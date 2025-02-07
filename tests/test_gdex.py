@@ -1,9 +1,37 @@
+import subprocess
+
 import spacy
 
 import gdex
 
-de_core_nlp = spacy.load("de_core_news_sm")
-de_hdt_nlp = spacy.load("de_hdt_lg")
+spacy.tokens.Token.set_extension("is_hit", default=False)
+
+spacy_model_packages = {
+    "de_core_news_sm": (
+        "de-core-news-sm @ https://github.com/explosion/spacy-models/"
+        "releases/download/de_core_news_sm-3.7.0/"
+        "de_core_news_sm-3.7.0-py3-none-any.whl"
+        "#sha256=d88c737eb7eb766f730f6a2dcb99dfcdb81623e1e0d89a9c638a2182ac19c52e"
+    ),
+    "de_hdt_dist": (
+        "de_hdt_dist @ https://huggingface.co/zentrum-lexikographie/de_hdt_dist/"
+        "resolve/main/de_hdt_dist-any-py3-none-any.whl"
+        "#sha256=dd54e4f75b249d401ed664c406c1a021ee6733bca7c701eb4500480d473a1a8a"
+    ),
+}
+
+
+def spacy_model(model):
+    try:
+        return spacy.load(model)
+    except OSError:
+        assert model in spacy_model_packages, model
+        subprocess.check_call(["pip", "install", "-qqq", spacy_model_packages[model]])
+        return spacy.load(model)
+
+
+de_core_nlp = spacy_model("de_core_news_sm")
+de_hdt_nlp = spacy_model("de_hdt_dist")
 
 
 def scores(s):
@@ -44,6 +72,40 @@ def test_scoring():
             assert sent._.gdex >= 0.0 and sent._.gdex <= 1.0
 
 
+def test_hypotaxis_hdt():
+    test_sents = [
+        ("Haus", "Leider verpasste sie den Anruf, weil sie später nach Hause kam."),
+        (None, "Herbstspaziergänge sind besonders schön, wenn es nicht regnet."),
+        (
+            None,
+            (
+                "Der uralte Baum, der schon damals hier stand, "
+                "gehörte fest in das Stadtbild."
+            ),
+        ),
+        (
+            None,
+            (
+                "Um besser sehen zu können, braucht man eventuell eine Brille, "
+                "auch Sehhilfe genannt."
+            ),
+        ),
+    ]
+    nlp, scorer = de_hdt_nlp, gdex.de_hdt
+    for headword, s in test_sents:
+        doc = nlp(s)
+        if headword:
+            for token in doc:
+                if token.lemma_ == headword:
+                    token._.is_hit = True
+        for sent in doc.sents:
+            score = scorer.factor_hypotaxis(sent)
+            if headword:
+                assert score == 1.0 - 2 * scorer.penalty_hypotaxis
+            else:
+                assert score < 1.0
+
+
 def test_illegal_chars():
     assert_knockout("Das ist ein Satz mit unzulässigen Zeichen [1].")
     assert_knockout("Gleiches gilt für diesen Satz mit test@test.de.")
@@ -73,7 +135,7 @@ def test_finite_verb_and_subject():
 
 def test_rarechars():
     factor_method = gdex.SentenceScorer.factor_rarechars
-    assert_penalty(factor_method, "1. Aufzählungen und Zahlen mögen wir nicht.")
+    assert_penalty(factor_method, "1. Aufzählungen und Zahlen wie 3 mögen wir nicht.")
     assert_penalty(factor_method, "Worte in Klammern (Paranthese) sind schlecht.")
 
 

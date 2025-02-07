@@ -25,8 +25,9 @@ Among the gradual criteria are
 * the absence of rare characters or those normally not available on a keyboard,
 * the absence of named entities,
 * the absence of deictic expressions,
-* an optimal length of the sentence, and
-* a whitelist-based coverage test, i. e. for penalizing usage of rare lemmata.
+* an optimal length of the sentence,
+* a whitelist-based coverage test, i. e. for penalizing usage of rare lemmata, and
+* the absence of subordinate clauses / the headword being part of a main clause.
 
 ## Installation
 

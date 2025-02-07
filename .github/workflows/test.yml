@@ -16,7 +16,7 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
-        pip install -U pip
+        pip install -U pip setuptools wheel
         pip install '.[dev]'
     - name: Run unit tests
       run: |

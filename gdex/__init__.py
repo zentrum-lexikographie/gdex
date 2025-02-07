@@ -29,6 +29,8 @@ class SentenceScorer:
     is_misparsed: Callable[[Span], bool] = lambda sent: False
     is_deixis: Callable[[Token], bool] = lambda token: False
     num_entities: Callable[[Span], int] = lambda sent: 0
+    is_hypotactic: Callable[[Span], bool] = lambda sent: False
+    hit_in_subordinate_clause: Callable[[Span], bool] = lambda sent: False
 
     whitelist: Set[str] = field(default_factory=set, repr=False)
     blacklist: Set[str] = field(default_factory=set, repr=False)
@@ -40,6 +42,7 @@ class SentenceScorer:
     penalty_rare_char: float = 0.125
     penalty_named_entity: float = 0.1667
     penalty_deixis: float = 0.034
+    penalty_hypotaxis: float = 0.067  # doubled if hit in a subordinate clause
 
     def score_sentence(self, sent: Span, headword=None) -> float:
         score = 0.5 * self.has_no_knockout_criterion(sent)
@@ -76,6 +79,8 @@ class SentenceScorer:
             factor *= self.factor_optimal_interval(sent)
         if self.penalty_deixis is not None:
             factor *= self.factor_deixis(sent, headword)
+        if self.penalty_hypotaxis is not None:
+            factor *= self.factor_hypotaxis(sent)
         return factor
 
     def has_illegal_chars(self, sent: Span):
@@ -139,6 +144,14 @@ class SentenceScorer:
 
     def factor_deixis(self, sent: Span, headword: str):
         return self.factor_tokens(sent, headword, self.is_deixis, self.penalty_deixis)
+
+    def factor_hypotaxis(self, sent: Span) -> float:
+        factor = 1.0
+        if self.hit_in_subordinate_clause(sent):  # implies hypotaxis
+            factor -= 2 * self.penalty_hypotaxis
+        elif self.is_hypotactic(sent):
+            factor -= self.penalty_hypotaxis
+        return max(0.0, factor)
 
 
 def _de_has_finite_verb_and_subject(sent: Span) -> bool:
@@ -232,6 +245,25 @@ def _de_hdt_num_entities(sent: Span):
     return sum((1 for t in sent if t.pos_ == "PROPN"))
 
 
+# aim: identify sentences with VL subordinate clauses
+_DE_HDT_HYPO_DEPS = {"acl", "advcl", "ccomp", "csubj"}
+
+
+def _de_hdt_is_hypotactic(sent: Span) -> bool:
+    deps = {t.dep_ for t in sent}
+    if deps.isdisjoint(_DE_HDT_HYPO_DEPS):
+        return False
+    return True
+
+
+def _de_hdt_hit_in_subordinate_clause(sent: Span) -> bool:
+    for token in sent:
+        if token.dep_ in _DE_HDT_HYPO_DEPS:
+            if any((t._.is_hit for t in token.subtree)):
+                return True
+    return False
+
+
 _QWERTZ_DE = set(
     (
         "^1234567890ß'qwertzuiopü+asdfghjklöä#<yxcvbnm,.-°!\"§$%&/()=?`"
@@ -273,6 +305,8 @@ de_hdt = SentenceScorer(
     keyboard_chars=_QWERTZ_DE,
     whitelist=_de_whitelist,
     blacklist=_de_vulger_blacklist,
+    is_hypotactic=_de_hdt_is_hypotactic,
+    hit_in_subordinate_clause=_de_hdt_hit_in_subordinate_clause,
 )
 
 __all__ = ["SentenceScorer", "de_core", "de_hdt"]

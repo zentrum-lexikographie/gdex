@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic"
 ]
 requires-python = ">=3.7"
-dependencies = ["spacy>=3.7"]
+dependencies = ["spacy==3.7.5"]
 dynamic = ["readme", "version"]
 
 [project.optional-dependencies]
@@ -33,8 +33,7 @@ dev = [
     "mypy",
     "pre-commit",
     "pytest",
-    "de-core-news-sm @ https://github.com/explosion/spacy-models/releases/download/de_core_news_sm-3.7.0/de_core_news_sm-3.7.0-py3-none-any.whl#sha256=d88c737eb7eb766f730f6a2dcb99dfcdb81623e1e0d89a9c638a2182ac19c52e",
-    "de_hdt_lg @ https://huggingface.co/zentrum-lexikographie/de_hdt_lg/resolve/main/de_hdt_lg-any-py3-none-any.whl#sha256=44bd0b0299865341ee1756efd60670fa148dbfd2a14d0c1d5ab99c61af08236a"
+    "spacy-transformers",
 ]
 
 [project.urls]
@@ -45,6 +44,11 @@ omit = ["tests/**/*.py"]
 
 [tool.isort]
 profile = "black"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore::FutureWarning",
+]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
