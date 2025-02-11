@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.2.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.1.0...v1.2.0) (2025-02-11)
+
+
+### Features
+
+* penalize subordinate clauses ([12e4208](https://github.com/zentrum-lexikographie/gdex/commit/12e4208d0ad27f33bcbc18b97a04d39edfcf9e00))
+
+
+### Bug Fixes
+
+* **Documentation:** Corrects description of score range ([9d73907](https://github.com/zentrum-lexikographie/gdex/commit/9d73907cbdba8bd64212190f69a4698f5f3ba99d))
+* **Project:** Add @Natalie-T-E as contributor ([a32947f](https://github.com/zentrum-lexikographie/gdex/commit/a32947f17b3ede4e4c890f4590f36fc983eface8))
+
 ## [1.1.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.0.1...v1.1.0) (2024-12-19)
 
 
