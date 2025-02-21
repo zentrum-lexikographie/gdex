@@ -13,6 +13,7 @@ _DEFAULT_ILLEGAL_CHARS = "<>|[]/\\^@"
 _DEFAULT_RARE_CHARS = "0123456789')(-"
 
 Span.set_extension("gdex", default=0.0)
+Token.set_extension("is_hit", default=False)
 
 
 @dataclass

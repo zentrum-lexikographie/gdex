@@ -4,8 +4,6 @@ import spacy
 
 import gdex
 
-spacy.tokens.Token.set_extension("is_hit", default=False)
-
 spacy_model_packages = {
     "de_core_news_sm": (
         "de-core-news-sm @ https://github.com/explosion/spacy-models/"
