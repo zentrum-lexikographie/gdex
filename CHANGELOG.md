@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.2.0...v1.2.1) (2025-02-21)
+
+
+### Bug Fixes
+
+* Declare required token annotation "is_hit" in main module ([af2b93c](https://github.com/zentrum-lexikographie/gdex/commit/af2b93c51b8522d85595e63468dcc8326a3e4e1e))
+
 ## [1.2.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.1.0...v1.2.0) (2025-02-11)
 
 
