@@ -17,7 +17,7 @@ with de_vulger_file.open(encoding="utf-8") as vulger:
             continue
         de_vulger_blacklist.add(word)
 
-de_whitelist = []
+de_whitelist = set()
 with urllib.request.urlopen("https://www.dwds.de/lemma/csv") as f:
     lemmata = f.read().decode("utf-8")
     for lemma in csv.DictReader(io.StringIO(lemmata)):
@@ -30,7 +30,7 @@ with urllib.request.urlopen("https://www.dwds.de/lemma/csv") as f:
         lemma_form = lemma["lemma"]
         if lemma_form in de_vulger_blacklist:
             continue
-        de_whitelist.append(lemma_form)
+        de_whitelist.add(lemma_form)
 
 de_whitelist_file = project_dir / "gdex" / "de_whitelist.txt"
-de_whitelist_file.write_text("\n".join(de_whitelist))
+de_whitelist_file.write_text("\n".join(sorted(de_whitelist)))
