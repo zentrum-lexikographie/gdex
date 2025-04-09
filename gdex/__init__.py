@@ -9,7 +9,7 @@ from spacy.tokens.token import Token
 
 from .version import __version__
 
-_DEFAULT_ILLEGAL_CHARS = "<>|[]/\\^@"
+_DEFAULT_ILLEGAL_CHARS = "<>|[]/\\^@·•"
 _DEFAULT_RARE_CHARS = "0123456789')(-"
 
 Span.set_extension("gdex", default=0.0)
@@ -70,7 +70,7 @@ class SentenceScorer:
         if self.penalty_blacklist is not None:
             factor *= self.factor_blacklist(sent, headword)
         if len(self.whitelist) > 0:
-            factor *= self.factor_whitelist(sent, headword)
+            factor *= self.factor_rarelemmas(sent, headword)
         if self.penalty_rare_char is not None:
             factor *= self.factor_rarechars(sent)
         if len(self.keyboard_chars) > 0:
@@ -120,9 +120,15 @@ class SentenceScorer:
             sent, headword, lambda t: t.lemma_ in self.blacklist, self.penalty_blacklist
         )
 
-    def factor_whitelist(self, sent: Span, headword: str):
+    def factor_rarelemmas(self, sent: Span, headword: str):
         return sum(
-            (1 for t in sent if t.lemma != headword and t.lemma_ not in self.whitelist)
+            (
+                1
+                for t in sent
+                if t.lemma == headword
+                or t.pos_ == "PUNCT"
+                or t.lemma_ in self.whitelist
+            )
         ) / len(sent)
 
     def factor_optimal_interval(self, sent: Span) -> float:
@@ -274,7 +280,7 @@ _QWERTZ_DE = set(
     )
 )
 
-# top lemmata extract from DWDS flagship corpora
+# most frequent DWDS lemmata (disjoint with vulgar words)
 _de_whitelist_file = (Path(__file__) / ".." / "de_whitelist.txt").resolve()
 _de_whitelist = set(_de_whitelist_file.read_text(encoding="utf-8").splitlines())
 
