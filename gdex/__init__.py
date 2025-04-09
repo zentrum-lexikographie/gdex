@@ -280,7 +280,7 @@ _QWERTZ_DE = set(
     )
 )
 
-# top lemmata extract from DWDS flagship corpora
+# most frequent DWDS lemmata (disjoint with vulgar words)
 _de_whitelist_file = (Path(__file__) / ".." / "de_whitelist.txt").resolve()
 _de_whitelist = set(_de_whitelist_file.read_text(encoding="utf-8").splitlines())
 
