@@ -152,8 +152,8 @@ def test_blacklist():
     assert_penalty(factor_method, "Manche Sätze sind Scheiße.", "Satz")
 
 
-def test_whitelist():
-    factor_method = gdex.SentenceScorer.factor_whitelist
+def test_rarelemmas():
+    factor_method = gdex.SentenceScorer.factor_rarelemmas
     assert_penalty(factor_method, "Wir sind alle Idiosynkrasien.", "sein")
 
 
