@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.2.2...v1.3.0) (2025-04-10)
+
+
+### Features
+
+* Extract German whitelist from DWDS lemma list ([f72044d](https://github.com/zentrum-lexikographie/gdex/commit/f72044d02853c545275b7ee76d14f207c66498e1))
+
 ## [1.2.2](https://github.com/zentrum-lexikographie/gdex/compare/v1.2.1...v1.2.2) (2025-02-24)
 
 
