@@ -126,7 +126,7 @@ class SentenceScorer:
                 1
                 for t in sent
                 if t.lemma == headword
-                or t.pos_ == "PUNCT"
+                or t.pos_ in {"PUNCT", "DET", "PRON", "ADP"}
                 or t.lemma_ in self.whitelist
             )
         ) / len(sent)
