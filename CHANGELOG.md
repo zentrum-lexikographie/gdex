@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.3.0...v1.3.1) (2025-04-10)
+
+
+### Bug Fixes
+
+* Exclude relevant POS in factor_rarelemmas ([e687826](https://github.com/zentrum-lexikographie/gdex/commit/e68782602515e7da88e8dd1819daf8676d5b2099))
+
 ## [1.3.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.2.2...v1.3.0) (2025-04-10)
 
 
