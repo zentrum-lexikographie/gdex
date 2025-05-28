@@ -40,7 +40,7 @@ class SentenceScorer:
     optimal_min_len: int = 10
     optimal_max_len: int = 20
 
-    penalty_blacklist: float = 0.067
+    penalty_blacklist: float = 0.1667
     penalty_rare_char: float = 0.125
     penalty_named_entity: float = 0.1667
     penalty_deixis: float = 0.034
