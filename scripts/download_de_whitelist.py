@@ -33,4 +33,4 @@ with urllib.request.urlopen("https://www.dwds.de/lemma/csv") as f:
         de_whitelist.add(lemma_form)
 
 de_whitelist_file = project_dir / "gdex" / "de_whitelist.txt"
-de_whitelist_file.write_text("\n".join(sorted(de_whitelist)))
+de_whitelist_file.write_text("\n".join(sorted(de_whitelist)), encoding="utf-8")
