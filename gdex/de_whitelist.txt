@@ -17552,7 +17552,6 @@ Longhorn
 Look
 Loop
 Looping
-Looser
 Loot
 Lorbeer
 Lorbeerblatt
@@ -24506,7 +24505,6 @@ Schirmer
 Schirmherr
 Schirmherrschaft
 Schizophrenie
-Schiß
 Schlacht
 Schlachter
 Schlachtfeld
@@ -24767,7 +24765,6 @@ Schneidezahn
 Schneise
 Schnelle
 Schnelligkeit
-Schnellschuß
 Schnellstraße
 Schnellzug
 Schnickschnack
@@ -36801,7 +36798,6 @@ eisig
 eiskalt
 eitel
 eiweißreich
-ekelig
 eklatant
 ekstatisch
 elastisch

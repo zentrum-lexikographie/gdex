@@ -382,7 +382,6 @@ SCHUFA
 Saisonabschluss
 Saisonschluss
 Schauprozess
-Schiss
 Schloss
 Schlossanlage
 Schlossberg
@@ -419,7 +418,6 @@ Schlussstrich
 Schlusstag
 Schlusswort
 Schnappschuss
-Schnellschuss
 Schoss
 Schraubverschluss
 Schreckschusspistole

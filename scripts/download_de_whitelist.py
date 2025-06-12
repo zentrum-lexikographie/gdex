@@ -20,18 +20,28 @@ with de_vulger_file.open(encoding="utf-8") as vulger:
         if float(score) > 0:
             continue
         de_vulger_blacklist.add(word)
+# add other (mis)spellings or forms, for example "deppat" and "Looser",
+# based on "deppert" and "Loser", respectively;
+# unless: new form + 'e' = original form (i.e., not "blöd" based on "blöde")
+for entry in lemma_database:
+    lemma = entry["lemma"]
+    if lemma in de_vulger_blacklist and "other_lemmata" in entry:
+        for related_lemma in entry["other_lemmata"]:
+            if related_lemma not in de_vulger_blacklist:
+                if not (lemma.endswith("e") and related_lemma == lemma[:-1]):
+                    de_vulger_blacklist.add(related_lemma)
 
-for lemma in lemma_database:
-    freq_class = lemma["freq"]
+for entry in lemma_database:
+    freq_class = entry["freq"]
     if freq_class == "n/a":
         continue
     freq_class = int(freq_class)
     if freq_class < 2:
         continue
-    lemma_form = lemma["lemma"]
-    if lemma_form in de_vulger_blacklist:
+    lemma = entry["lemma"]
+    if lemma in de_vulger_blacklist:
         continue
-    de_whitelist.add(lemma_form)
+    de_whitelist.add(lemma)
 
 de_whitelist_file = project_dir / "gdex" / "de_whitelist.txt"
-de_whitelist_file.write_text("\n".join(sorted(de_whitelist)), encoding="utf-8")
+de_whitelist_file.write_text("\n".join(sorted(de_whitelist)) + "\n", encoding="utf-8")
