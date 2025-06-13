@@ -139,7 +139,6 @@ Essverhalten
 Esszimmer
 Expressversand
 Exzess
-FLOP
 Fachausschuss
 Fachkongress
 Fahrradschloss
@@ -422,7 +421,6 @@ Schlussstrich
 Schlusstag
 Schlusswort
 Schnappschuss
-Schoss
 Schraubverschluss
 Schreckschusspistole
 Schreckschusswaffe
@@ -551,7 +549,6 @@ bewusstlos
 bisschen
 bissfest
 blass
-ces
 cis
 derjenige
 derselbe
@@ -560,7 +557,6 @@ e
 ebendieser
 ebenjener
 einflussreich
-eis
 erfassbar
 essbar
 fade
@@ -573,10 +569,8 @@ geboren
 gelinde
 genussvoll
 genüsslich
-ges
 gesundheitsbewusst
 gewiss
-gis
 grässlich
 gusseisern
 hasserfüllt
@@ -589,7 +583,6 @@ jeder
 k
 kaltgepresst
 kess
-kibben
 krass
 kross
 m
@@ -608,7 +601,6 @@ passgenau
 pflichtbewusst
 polyfon
 preisbewusst
-pu
 regennass
 selbstbewusst
 sesshaft
