@@ -100,7 +100,7 @@ class SentenceScorer:
 
     def factor_notkeyboardchar(self, sent: Span):
         txt = sent.text
-        return sum((1 for c in txt if c in self.keyboard_chars)) / len(txt) ** 2
+        return (sum((1 for c in txt if c in self.keyboard_chars)) / len(txt)) ** 2
 
     def factor_named_entities(self, sent: Span):
         return max(0.0, 1.0 - self.penalty_named_entity * self.num_entities(sent))
