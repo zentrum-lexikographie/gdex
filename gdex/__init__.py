@@ -46,14 +46,14 @@ class SentenceScorer:
     penalty_deixis: float = 0.034
     penalty_hypotaxis: float = 0.067  # doubled if hit in a subordinate clause
 
-    def score_sentence(self, sent: Span, headword=None) -> float:
+    def score_sentence(self, sent: Span) -> float:
         score = 0.5 * self.has_no_knockout_criterion(sent)
-        score += 0.5 * self.factor_gradual_criteria(sent, headword)
+        score += 0.5 * self.factor_gradual_criteria(sent)
         return score
 
-    def __call__(self, doc: Doc, headword=None) -> Doc:
+    def __call__(self, doc: Doc) -> Doc:
         for sent in doc.sents:
-            sent._.gdex = self.score_sentence(sent, headword)
+            sent._.gdex = self.score_sentence(sent)
         return doc
 
     def has_no_knockout_criterion(self, sent):
@@ -65,12 +65,12 @@ class SentenceScorer:
             return False
         return True
 
-    def factor_gradual_criteria(self, sent, headword):
+    def factor_gradual_criteria(self, sent):
         factor = 1.0
         if self.penalty_blacklist is not None:
-            factor *= self.factor_blacklist(sent, headword)
+            factor *= self.factor_blacklist(sent)
         if len(self.whitelist) > 0:
-            factor *= self.factor_rarelemmas(sent, headword)
+            factor *= self.factor_rarelemmas(sent)
         if self.penalty_rare_char is not None:
             factor *= self.factor_rarechars(sent)
         if len(self.keyboard_chars) > 0:
@@ -80,7 +80,7 @@ class SentenceScorer:
         if self.optimal_min_len is not None and self.optimal_max_len is not None:
             factor *= self.factor_optimal_interval(sent)
         if self.penalty_deixis is not None:
-            factor *= self.factor_deixis(sent, headword)
+            factor *= self.factor_deixis(sent)
         if self.penalty_hypotaxis is not None:
             factor *= self.factor_hypotaxis(sent)
         return factor
@@ -108,24 +108,23 @@ class SentenceScorer:
     def factor_tokens(
         self,
         sent: Span,
-        headword: str,
         pred: Callable[[Token], bool],
         penalty_factor: float,
     ) -> float:
-        num_matches = sum((1 for t in sent if t.lemma_ != headword and pred(t)))
+        num_matches = sum((1 for t in sent if not t._.is_hit and pred(t)))
         return max(0.0, 1.0 - penalty_factor * num_matches)
 
-    def factor_blacklist(self, sent: Span, headword: str):
+    def factor_blacklist(self, sent: Span):
         return self.factor_tokens(
-            sent, headword, lambda t: t.lemma_ in self.blacklist, self.penalty_blacklist
+            sent, lambda t: t.lemma_ in self.blacklist, self.penalty_blacklist
         )
 
-    def factor_rarelemmas(self, sent: Span, headword: str):
+    def factor_rarelemmas(self, sent: Span):
         return sum(
             (
                 1
                 for t in sent
-                if t.lemma == headword
+                if t._.is_hit
                 or t.pos_ in {"PUNCT", "DET", "PRON", "ADP"}
                 or t.lemma_ in self.whitelist
             )
@@ -150,8 +149,8 @@ class SentenceScorer:
             diff = (2 * high) - num_tokens
             return diff / high
 
-    def factor_deixis(self, sent: Span, headword: str):
-        return self.factor_tokens(sent, headword, self.is_deixis, self.penalty_deixis)
+    def factor_deixis(self, sent: Span):
+        return self.factor_tokens(sent, self.is_deixis, self.penalty_deixis)
 
     def factor_hypotaxis(self, sent: Span) -> float:
         factor = 1.0
