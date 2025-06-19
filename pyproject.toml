@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic"
 ]
 requires-python = ">=3.7"
-dependencies = ["spacy==3.7.5"]
+dependencies = ["spacy==3.8.7"]
 dynamic = ["readme", "version"]
 
 [project.optional-dependencies]

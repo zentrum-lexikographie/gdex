@@ -8,13 +8,13 @@ spacy_model_packages = {
     "de_core_news_sm": (
         "de-core-news-sm @ https://github.com/explosion/spacy-models/"
         "releases/download/de_core_news_sm-3.7.0/"
-        "de_core_news_sm-3.7.0-py3-none-any.whl"
-        "#sha256=d88c737eb7eb766f730f6a2dcb99dfcdb81623e1e0d89a9c638a2182ac19c52e"
+        "de_core_news_sm-3.8.0-py3-none-any.whl"
+        "#sha256=fec69fec52b1780f2d269d5af7582a5e28028738bd3190532459aeb473bfa3e7"
     ),
     "de_hdt_dist": (
         "de_hdt_dist @ https://huggingface.co/zentrum-lexikographie/de_hdt_dist/"
         "resolve/main/de_hdt_dist-any-py3-none-any.whl"
-        "#sha256=dd54e4f75b249d401ed664c406c1a021ee6733bca7c701eb4500480d473a1a8a"
+        "#sha256=02ba1b5db8c15a06aeea46bab1e248704e4a33aab11ef7846b68fa622393c330"
     ),
 }
 
@@ -42,14 +42,11 @@ def assert_knockout(s):
             assert sent._.gdex <= 0.5
 
 
-def assert_penalty(factor_method, s, headword=None):
+def assert_penalty(factor_method, s):
     for nlp, scorer in ((de_core_nlp, gdex.de_core), (de_hdt_nlp, gdex.de_hdt)):
         doc = nlp(s)
         for sent in doc.sents:
-            if headword is not None:
-                assert factor_method(scorer, sent, headword) < 1.0
-            else:
-                assert factor_method(scorer, sent) < 1.0
+            assert factor_method(scorer, sent) < 1.0
 
 
 def test_scoring():
@@ -92,7 +89,7 @@ def test_hypotaxis_hdt():
     nlp, scorer = de_hdt_nlp, gdex.de_hdt
     for headword, s in test_sents:
         doc = nlp(s)
-        if headword:
+        if headword is not None:
             for token in doc:
                 if token.lemma_ == headword:
                     token._.is_hit = True
@@ -133,8 +130,8 @@ def test_finite_verb_and_subject():
 
 def test_rarechars():
     factor_method = gdex.SentenceScorer.factor_rarechars
-    assert_penalty(factor_method, "1. Aufzählungen und Zahlen wie 3 mögen wir nicht.")
-    assert_penalty(factor_method, "Worte in Klammern (Paranthese) sind schlecht.")
+    assert_penalty(factor_method, "Für Zeichen wie + & € gibt es Punktabzug.")
+    assert_penalty(factor_method, "Auch Klammern (Parenthese) sind nicht ideal.")
 
 
 def test_notkeyboardchar():
@@ -149,12 +146,12 @@ def test_named_entities():
 
 def test_blacklist():
     factor_method = gdex.SentenceScorer.factor_blacklist
-    assert_penalty(factor_method, "Manche Sätze sind Scheiße.", "Satz")
+    assert_penalty(factor_method, "Manche Sätze sind Trash.")
 
 
 def test_rarelemmas():
     factor_method = gdex.SentenceScorer.factor_rarelemmas
-    assert_penalty(factor_method, "Wir sind alle Idiosynkrasien.", "sein")
+    assert_penalty(factor_method, "Wir sind alle Idiosynkrasien.")
 
 
 def test_optimal_interval():
@@ -166,6 +163,6 @@ def test_optimal_interval():
 
 def test_deixis():
     factor_method = gdex.SentenceScorer.factor_deixis
-    assert_penalty(factor_method, "Hier ist es schlecht!", "schlecht")
-    assert_penalty(factor_method, "Unten und oben ist es auch schlecht!", "schlecht")
-    assert_penalty(factor_method, "Jetzt bitte nicht!", "bitte")
+    assert_penalty(factor_method, "Hier ist es schlecht!")
+    assert_penalty(factor_method, "Unten und oben ist es auch schlecht!")
+    assert_penalty(factor_method, "Jetzt bitte nicht!")
