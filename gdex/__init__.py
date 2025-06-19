@@ -10,7 +10,7 @@ from spacy.tokens.token import Token
 from .version import __version__
 
 _DEFAULT_ILLEGAL_CHARS = "<>|[]{}/\\^@·•"
-_DEFAULT_RARE_CHARS = "'’‘)(-_+*~#°§%&€£$¥…©®™"
+_DEFAULT_RARE_CHARS = "'’‘)(_+*~#°§%&€£$¥…©®™"
 
 Span.set_extension("gdex", default=0.0)
 if not Token.has_extension("is_hit"):
