@@ -7,7 +7,7 @@ import gdex
 spacy_model_packages = {
     "de_core_news_sm": (
         "de-core-news-sm @ https://github.com/explosion/spacy-models/"
-        "releases/download/de_core_news_sm-3.7.0/"
+        "releases/download/de_core_news_sm-3.8.0/"
         "de_core_news_sm-3.8.0-py3-none-any.whl"
         "#sha256=fec69fec52b1780f2d269d5af7582a5e28028738bd3190532459aeb473bfa3e7"
     ),
