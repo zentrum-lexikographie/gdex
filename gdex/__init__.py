@@ -125,7 +125,8 @@ class SentenceScorer:
                 1
                 for t in sent
                 if t._.is_hit
-                or t.pos_ in {"PUNCT", "DET", "PRON", "ADP"}
+                or t.pos_ in {"PUNCT", "DET", "PRON", "ADP", "CCONJ", "SCONJ"}
+                or t.tag_ == "PROAV"
                 or t.lemma_ in self.whitelist
             )
         ) / len(sent)
