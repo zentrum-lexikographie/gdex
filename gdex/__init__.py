@@ -40,11 +40,11 @@ class SentenceScorer:
     optimal_min_len: int = 10
     optimal_max_len: int = 20
 
-    penalty_blacklist: float = 0.1667
-    penalty_rare_char: float = 0.125
-    penalty_named_entity: float = 0.1667
-    penalty_deixis: float = 0.034
-    penalty_hypotaxis: float = 0.067  # doubled if hit_in_subordinate_clause
+    penalty_blacklist: float = 0.1667  # 1/6
+    penalty_named_entity: float = 0.1667  # 1/6
+    penalty_rare_char: float = 0.125  # 1/(2**3)
+    penalty_hypotaxis: float = 0.0625  # 1/(2**4), doubled if hit_in_subordinate_clause
+    penalty_deixis: float = 0.03125  # 1/(2**5)
 
     def score_sentence(self, sent: Span) -> float:
         score = 0.5 * self.has_no_knockout_criterion(sent)
