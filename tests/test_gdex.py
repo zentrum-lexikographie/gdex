@@ -69,7 +69,8 @@ def test_scoring():
 
 def test_hypotaxis_hdt():
     test_sents = [
-        ("Haus", "Leider verpasste sie den Anruf, weil sie später nach Hause kam."),
+        ("Hause", "Leider verpasste sie den Anruf, weil sie später nach Hause kam."),
+        ("gewittert", "Dass es im Sommer gewittert, kommt nicht selten vor."),
         (None, "Herbstspaziergänge sind besonders schön, wenn es nicht regnet."),
         (
             None,
@@ -85,20 +86,27 @@ def test_hypotaxis_hdt():
                 "auch Sehhilfe genannt."
             ),
         ),
+        (
+            "Pinguine",
+            (
+                "Alle Pinguine sind flugunfähig, wobei nicht "
+                "alle flugunfähigen Vögel Pinguine sind."
+            ),
+        ),
     ]
     nlp, scorer = de_hdt_nlp, gdex.de_hdt
-    for headword, s in test_sents:
+    for hit, s in test_sents:
         doc = nlp(s)
-        if headword is not None:
+        if hit is not None:
             for token in doc:
-                if token.lemma_ == headword:
+                if token.text == hit:
                     token._.is_hit = True
         for sent in doc.sents:
             score = scorer.factor_hypotaxis(sent)
-            if headword:
+            if hit == "Hause":
                 assert score == 1.0 - 2 * scorer.penalty_hypotaxis
             else:
-                assert score < 1.0
+                assert score == 1.0 - scorer.penalty_hypotaxis
 
 
 def test_illegal_chars():

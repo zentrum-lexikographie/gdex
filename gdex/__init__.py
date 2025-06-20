@@ -44,7 +44,7 @@ class SentenceScorer:
     penalty_rare_char: float = 0.125
     penalty_named_entity: float = 0.1667
     penalty_deixis: float = 0.034
-    penalty_hypotaxis: float = 0.067  # doubled if hit in a subordinate clause
+    penalty_hypotaxis: float = 0.067  # doubled if hit_in_subordinate_clause
 
     def score_sentence(self, sent: Span) -> float:
         score = 0.5 * self.has_no_knockout_criterion(sent)
@@ -265,11 +265,19 @@ def _de_hdt_is_hypotactic(sent: Span) -> bool:
 
 
 def _de_hdt_hit_in_subordinate_clause(sent: Span) -> bool:
+    hit_indices = {t.i for t in sent if t._.is_hit}
+    if not hit_indices:
+        return False
+    subclause_indices = set()
     for token in sent:
         if token.dep_ in _DE_HDT_HYPO_DEPS:
-            if any((t._.is_hit for t in token.subtree)):
-                return True
-    return False
+            subtree_indices = {t.i for t in token.subtree}
+            if sent[0].i in subtree_indices:
+                continue  # exception, because prominent placement seems likely
+            subclause_indices.update(subtree_indices)
+    if hit_indices.issubset(subclause_indices):
+        return True
+    return False  # at least one hit in main clause
 
 
 _QWERTZ_DE = set(
