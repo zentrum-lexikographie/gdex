@@ -1,6 +1,6 @@
-# gdex
+# GDEX
 
-_Rule-based sentence scoring algorithm_
+_Good Dictionary Examples – Rule-based Sentence Scoring Algorithm_
 
 This Python package provides a
 [GDEX](https://www.sketchengine.eu/guide/gdex/)-based algorithm for

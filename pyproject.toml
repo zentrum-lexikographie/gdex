@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gdex"
-description = "Rule-based sentence scoring algorithm"
+description = "Good Dictionary Examples – Rule-based Sentence Scoring Algorithm"
 authors = [
     {name = "Ulf Hamster", email = "554c46@gmail.com"},
     {name = "Gregor Middell", email = "gregor.middell@bbaw.de"},
