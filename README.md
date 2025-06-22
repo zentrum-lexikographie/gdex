@@ -47,11 +47,11 @@ pip install -e .[dev]
 
 
 ``` python-console
->>> import spacy
+>>> import zdl_spacy
 >>> import gdex
->>> nlp = spacy.load("de_core_news_sm")
->>> [s._.gdex for s in gdex.de_core(nlp("Achtung! Das ist ein toller Test.")).sents]
-[0.0, 0.5322]
+>>> nlp = zdl_spacy.load()
+>>> [s._.gdex for s in gdex.de_hdt(nlp("Achtung! Das ist ein toller Test.")).sents]
+[0.0, 0.5968749999999999]
 ```
 
 ## Testing

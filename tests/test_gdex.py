@@ -1,35 +1,22 @@
 import subprocess
 
 import spacy
+import zdl_spacy
 
 import gdex
 
-spacy_model_packages = {
-    "de_core_news_sm": (
-        "de-core-news-sm @ https://github.com/explosion/spacy-models/"
-        "releases/download/de_core_news_sm-3.8.0/"
-        "de_core_news_sm-3.8.0-py3-none-any.whl"
-        "#sha256=fec69fec52b1780f2d269d5af7582a5e28028738bd3190532459aeb473bfa3e7"
-    ),
-    "de_hdt_dist": (
-        "de_hdt_dist @ https://huggingface.co/zentrum-lexikographie/de_hdt_dist/"
-        "resolve/main/de_hdt_dist-any-py3-none-any.whl"
-        "#sha256=02ba1b5db8c15a06aeea46bab1e248704e4a33aab11ef7846b68fa622393c330"
-    ),
-}
 
-
-def spacy_model(model):
+def load_de_core():
+    model = "de_core_news_sm"
     try:
         return spacy.load(model)
     except OSError:
-        assert model in spacy_model_packages, model
-        subprocess.check_call(["pip", "install", "-qqq", spacy_model_packages[model]])
+        subprocess.check_call(["python", "-m", "spacy", "download", model])
         return spacy.load(model)
 
 
-de_core_nlp = spacy_model("de_core_news_sm")
-de_hdt_nlp = spacy_model("de_hdt_dist")
+de_core_nlp = load_de_core()
+de_hdt_nlp = zdl_spacy.load()
 
 
 def scores(s):

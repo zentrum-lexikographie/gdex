@@ -21,20 +21,8 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Text Processing :: Linguistic"
 ]
-requires-python = ">=3.7"
-dependencies = ["spacy==3.8.7"]
-dynamic = ["readme", "version"]
-
-[project.optional-dependencies]
-dev = [
-    "coverage",
-    "flake8",
-    "flake8-bugbear",
-    "mypy",
-    "pre-commit",
-    "pytest",
-    "spacy-transformers",
-]
+requires-python = ">=3.12"
+dynamic = ["readme", "version", "dependencies", "optional-dependencies"]
 
 [project.urls]
 Homepage = "https://github.com/zentrum-lexikographie/gdex"
@@ -53,6 +41,8 @@ filterwarnings = [
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
 version = {attr = "gdex.version.__version__"}
+dependencies = { file = ["requirements.txt"] }
+optional-dependencies.dev = { file = ["requirements.dev.txt"] }
 
 [tool.setuptools.packages.find]
 exclude = ["tests"]
