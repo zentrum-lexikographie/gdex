@@ -35,6 +35,7 @@ profile = "black"
 
 [tool.pytest.ini_options]
 filterwarnings = [
+    "ignore::DeprecationWarning",
     "ignore::FutureWarning",
 ]
 
