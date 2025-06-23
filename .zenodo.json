@@ -1,0 +1,31 @@
+{
+  "creators": [
+    {
+      "affiliation": "University of Bremen",
+      "name": "Hamster, Ulf",
+      "orcid": "0000-0002-0440-4868"
+    },
+    {
+      "affiliation": "Berlin-Brandenburg Academy of Sciences and Humanities",
+      "name": "Middell, Gregor",
+      "orcid": "0009-0000-9256-4687"
+    },
+    {
+      "affiliation": "Berlin-Brandenburg Academy of Sciences and Humanities",
+      "name": "Sürmeli, Natalie"
+    }
+  ],
+  "description": "Python package providing a GDEX-based algorithm for evaluating sentences with regard to their suitability as good examples in dictionaries",
+  "keywords": [
+    "computional linguistics",
+    "nlp",
+    "german",
+    "lexicography",
+    "sentence-scoring"
+  ],
+  "license": {
+    "id": "Apache-2.0"
+  },
+  "title": "Good Dictionary Examples – A Rule-based Sentence Scoring Algorithm Implemented in Python",
+  "version": "1.4.0"
+}

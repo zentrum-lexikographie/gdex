@@ -1,0 +1,25 @@
+cff-version: "1.2.0"
+title: "Good Dictionary Examples – A Rule-based Sentence Scoring Algorithm Implemented in Python"
+version: 1.4.0
+license: "Apache-2.0"
+type: software
+abstract: "Python package providing a GDEX-based algorithm for evaluating sentences with regard to their suitability as good examples in dictionaries"
+message: "If you use this software, please cite it as below."
+authors:
+  - given-names: Ulf
+    family-names: Hamster
+    affiliation: University of Bremen
+    orcid: "https://orcid.org/0000-0002-0440-4868"
+  - given-names: Gregor
+    family-names: Middell
+    affiliation: Berlin-Brandenburg Academy of Sciences and Humanities
+    orcid: "https://orcid.org/0009-0000-9256-4687"
+  - given-names: Natalie
+    family-names: Sürmeli
+    affiliation: Berlin-Brandenburg Academy of Sciences and Humanities
+keywords:
+  - computional linguistics
+  - nlp
+  - german
+  - lexicography
+  - sentence-scoring
