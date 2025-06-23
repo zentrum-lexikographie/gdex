@@ -77,17 +77,6 @@ obscene. VulGer is used under the terms of the CC-BY-SA license.
 
 ## Bibliography
 
-* Adam Kilgarriff, Miloš Husák, Katy McAdam, Michael Rundell and Pavel
-  Rychlý. [GDEX: Automatically finding good dictionary examples in a
-  corpus](http://www.sketchengine.co.uk/wp-content/uploads/2015/05/GDEX_Automatically_finding_2008.pdf).
-  In Proceedings of the 13th EURALEX International Congress. Spain,
-  July 2008, pp. 425–432.
-* Didakowski, Jörg, Lothar Lemnitzer, and Alexander Geyken. [Automatic
-  example sentence extraction for a contemporary German
-  dictionary](https://euralex.org/publications/automatic-example-sentence-extraction-for-a-contemporary-german-dictionary/). Proceedings
-  EURALEX. 2012.
-* Elisabeth Eder, Ulrike Krieg-Holz, and Udo Hahn. 2019. [At the Lower
-  End of Language—Exploring the Vulgar and Obscene Side of
-  German.](https://aclanthology.org/W19-3513) In Proceedings of the
-  Third Workshop on Abusive Language Online, pages 119–128, Florence,
-  Italy. Association for Computational Linguistics.
+* Rychlý, Pavel, Miloš Husák, Adam Kilgarriff, Michael Rundell, und Katy McAdam. GDEX: Automatically Finding Good Dictionary Examples in a Corpus. Institut Universitari de Lingüística Aplicada, 2008. https://is.muni.cz/publication/772821/en/GDEX-Automatically-finding-good-dictionary-examples-in-a-corpus/Rychly-Husak-Kilgarriff-Rundell.
+* Didakowski, Jörg, Lothar Lemnitzer, und Alexander Geyken. „Automatic Example Sentence Extraction for a Contemporary German Dictionary“, 343–49, 2012. https://euralex.org/publications/automatic-example-sentence-extraction-for-a-contemporary-german-dictionary/.
+* Eder, Elisabeth, Ulrike Krieg-Holz, und Udo Hahn. „At the Lower End of Language—Exploring the Vulgar and Obscene Side of German“. In Proceedings of the Third Workshop on Abusive Language Online, herausgegeben von Sarah T. Roberts, Joel Tetreault, Vinodkumar Prabhakaran, und Zeerak Waseem, 119–28. Florence, Italy: Association for Computational Linguistics, 2019. https://doi.org/10.18653/v1/W19-3513.
