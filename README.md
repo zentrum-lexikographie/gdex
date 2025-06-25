@@ -2,6 +2,8 @@
 
 _Good Dictionary Examples – Rule-based Sentence Scoring Algorithm_
 
+[![DOI](https://zenodo.org/badge/894010183.svg)](https://doi.org/10.5281/zenodo.15735626)
+
 This Python package provides a
 [GDEX](https://www.sketchengine.eu/guide/gdex/)-based algorithm for
 evaluating sentences with regard to their suitability as good examples
