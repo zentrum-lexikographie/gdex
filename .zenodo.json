@@ -12,7 +12,8 @@
     },
     {
       "affiliation": "Berlin-Brandenburg Academy of Sciences and Humanities",
-      "name": "Sürmeli, Natalie"
+      "name": "Sürmeli, Natalie",
+      "orcid": "0009-0001-6896-6165"
     }
   ],
   "description": "Python package providing a GDEX-based algorithm for evaluating sentences with regard to their suitability as good examples in dictionaries",
