@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.4.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.3.1...v1.4.0) (2025-06-25)
+
+
+### Features
+
+* Adjust default penalties for hypotaxis and deixis ([8a6b882](https://github.com/zentrum-lexikographie/gdex/commit/8a6b882c5e6f015b17de8695b4ef72a170ee8b5a))
+* Base project on ZDL custom spaCy models, pin dependencies ([b5032c2](https://github.com/zentrum-lexikographie/gdex/commit/b5032c2018f8e04936f2216a50b1d1abeefafd26))
+* Change tagline of project, explaining origin of GDEX acronym ([701c6da](https://github.com/zentrum-lexikographie/gdex/commit/701c6da2a121d272a61e64bb58e9e6e37d0bf4f0))
+* Exclude conjunctions and pronominal adverbs as rare lemmas ([557d446](https://github.com/zentrum-lexikographie/gdex/commit/557d44640e6ec63457a8d91eb600be962112509e))
+* Exclude more variations/spellings of blacklisted words from whitelist ([99a8674](https://github.com/zentrum-lexikographie/gdex/commit/99a8674d5e4ecaf44dcddc84ae3256c2124ec4f3))
+* Increase default value for penalty_blacklist (now equal to penalty_named_entity) ([b4c6157](https://github.com/zentrum-lexikographie/gdex/commit/b4c61574308cb975ad09d5acaa6a9acb5616c61c))
+* Increase impact of notkeyboardchar (square penalty) ([30b8896](https://github.com/zentrum-lexikographie/gdex/commit/30b8896bd630cb5dd99abd1eb3a47e53d48d190a))
+* Redefine hit_in_subordinate_clause ([959cc42](https://github.com/zentrum-lexikographie/gdex/commit/959cc4208b6295e9f11239cbbdd8281cd0ac7560))
+* Remove hyphen-minus from _DEFAULT_RARE_CHARS ([c4278ce](https://github.com/zentrum-lexikographie/gdex/commit/c4278ceed5b34298d68ec1c19e35392bd7be3b22))
+* Update _DEFAULT_ILLEGAL_CHARS and _DEFAULT_RARE_CHARS ([f411752](https://github.com/zentrum-lexikographie/gdex/commit/f41175246213003be09a198804ebf187eec3600f))
+* Update dependencies and tests ([4da1400](https://github.com/zentrum-lexikographie/gdex/commit/4da1400478b6178a25469433d50ee7e2c8ef89e5))
+* Use custom Token attribute is_hit instead of kwarg headword ([d41820b](https://github.com/zentrum-lexikographie/gdex/commit/d41820b52d7654753d943f7002aab71d96d9d8e2))
+
 ## [1.3.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.3.0...v1.3.1) (2025-04-10)
 
 
