@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.4.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.4.0...v1.4.1) (2025-07-03)
+
+
+### Bug Fixes
+
+* Do not lock project dependencies, allowing for platform-dependent installs ([9aebc4c](https://github.com/zentrum-lexikographie/gdex/commit/9aebc4ce51af037b559e4bb297a560bde7b8a6da))
+
+
+### Dependencies
+
+* prepare release v1.4.1 ([48fb59e](https://github.com/zentrum-lexikographie/gdex/commit/48fb59efce0b428e036dc0778d0ff10485a10924))
+
 ## [1.4.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.3.1...v1.4.0) (2025-06-25)
 
 
