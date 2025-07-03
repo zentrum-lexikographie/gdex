@@ -1,6 +1,0 @@
-coverage
-flake8
-flake8-bugbear
-mypy
-pre-commit
-pytest
