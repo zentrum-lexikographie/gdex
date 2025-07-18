@@ -273,11 +273,12 @@ def _de_hdt_hit_in_subordinate_clause(sent: Span) -> bool:
         if token.dep_ in _DE_HDT_HYPO_DEPS:
             subtree_indices = {t.i for t in token.subtree}
             if sent[0].i in subtree_indices:
-                continue  # exception, because prominent placement seems likely
+                # exempt from this penalty, as a prominent placement is likely
+                continue
             subclause_indices.update(subtree_indices)
     if hit_indices.issubset(subclause_indices):
         return True
-    return False  # at least one hit in main clause
+    return False  # at least one hit in main clause or in exempted sub. clause
 
 
 _QWERTZ_DE = set(
