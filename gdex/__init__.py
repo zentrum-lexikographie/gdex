@@ -204,30 +204,40 @@ def _de_is_misparsed(sent: Span) -> bool:
     return False
 
 
-_DE_SPACE_DEIXIS_TERMS = {
+# spatial/directional and temporal deixis terms
+_DE_SPACE_TIME_DEIXIS_TERMS = {
     "hier",
     "dort",
-    "über",
-    "da",
-    "vor",
-    "hinter",
-    "links",
-    "von",
-    "rechts",
-    "oben",
-    "unten",
+    "dorthin",
+    "da",  # not if SCONJ
+    "dahin",
+    "jetzt",
+    "gestern",
+    "daraufhin",
+    "bald",
+    "anschließend",
+    "damals",
+    "einst",
+    "kürzlich",
+    "neulich",
 }
 
-_DE_TIME_DEIXIS_TERMS = {
-    "jetzt",
+# additional deictic expressions — to be penalized only if token.is_sent_start
+_DE_DEIXIS_TERMS_AT_START = {
+    "später",
+    "spätere",
     "heute",
-    "gestern",
+    "vorgestern",
     "morgen",
+    "übermorgen",
     "dann",
-    "damals",
-    "bald",
-    "kürzlich",
+    "danach",
+    "hinterher",
+    "deshalb",  # causal
+    "deswegen",  # causal
+    "damit",  # instrumental; not if SCONJ
 }
+# reference: https://grammis.ids-mannheim.de/terminologie/717
 
 _DE_PERSON_DEIXIS_PRON_TYPES = {"Prs", "Dem", "Ind", "Neg", "Tot"}
 
@@ -238,9 +248,11 @@ def _de_is_deixis(token: Token) -> bool:
         and token.morph.get("PronType", [""])[0] in _DE_PERSON_DEIXIS_PRON_TYPES
     ):
         return True
-    if token.lemma_.lower() in _DE_SPACE_DEIXIS_TERMS:
+    if token.pos_ == "SCONJ":
+        return False
+    if token.text.lower() in _DE_SPACE_TIME_DEIXIS_TERMS:
         return True
-    if token.lemma_.lower() in _DE_TIME_DEIXIS_TERMS:
+    if token.is_sent_start and token.text.lower() in _DE_DEIXIS_TERMS_AT_START:
         return True
     return False
 
