@@ -23,13 +23,20 @@ with de_vulger_file.open(encoding="utf-8") as vulger:
 # add other (mis)spellings or forms, for example "deppat" and "Looser",
 # based on "deppert" and "Loser", respectively;
 # unless: new form + 'e' = original form (i.e., not "blöd" based on "blöde")
+additions = set()
 for entry in lemma_database:
     lemma = entry["lemma"]
     if lemma in de_vulger_blacklist and "other_lemmata" in entry:
         for related_lemma in entry["other_lemmata"]:
             if related_lemma not in de_vulger_blacklist:
                 if not (lemma.endswith("e") and related_lemma == lemma[:-1]):
-                    de_vulger_blacklist.add(related_lemma)
+                    additions.add(related_lemma)
+de_vulger_blacklist.update(additions)
+# write additions to separate file to be read in gdex's __init__.py
+de_vulger_additions_file = project_dir / "gdex" / "additions_to_VulGer.txt"
+de_vulger_additions_file.write_text(
+    "\n".join(sorted(additions)) + "\n", encoding="utf-8"
+)
 
 for entry in lemma_database:
     freq_class = entry["freq"]
@@ -42,6 +49,14 @@ for entry in lemma_database:
     if lemma in de_vulger_blacklist:
         continue
     de_whitelist.add(lemma)
+
+de_whitelist_additions_file = (
+    project_dir / "scripts" / "data" / "de_whitelist_additions.txt"
+)
+if de_whitelist_additions_file.is_file():
+    de_whitelist.update(
+        de_whitelist_additions_file.read_text(encoding="utf-8").splitlines()
+    )
 
 de_whitelist_file = project_dir / "gdex" / "de_whitelist.txt"
 de_whitelist_file.write_text("\n".join(sorted(de_whitelist)) + "\n", encoding="utf-8")
