@@ -33,7 +33,7 @@ for entry in lemma_database:
                     additions.add(related_lemma)
 de_vulger_blacklist.update(additions)
 # write additions to separate file to be read in gdex's __init__.py
-de_vulger_additions_file = project_dir / "gdex" / "additions_to_VulGer.txt"
+de_vulger_additions_file = project_dir / "gdex" / "VulGer_additions.txt"
 de_vulger_additions_file.write_text(
     "\n".join(sorted(additions)) + "\n", encoding="utf-8"
 )
@@ -53,10 +53,9 @@ for entry in lemma_database:
 de_whitelist_additions_file = (
     project_dir / "scripts" / "data" / "de_whitelist_additions.txt"
 )
-if de_whitelist_additions_file.is_file():
-    de_whitelist.update(
-        de_whitelist_additions_file.read_text(encoding="utf-8").splitlines()
-    )
+de_whitelist.update(
+    de_whitelist_additions_file.read_text(encoding="utf-8").splitlines()
+)
 
 de_whitelist_file = project_dir / "gdex" / "de_whitelist.txt"
 de_whitelist_file.write_text("\n".join(sorted(de_whitelist)) + "\n", encoding="utf-8")

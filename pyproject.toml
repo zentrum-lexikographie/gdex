@@ -60,4 +60,4 @@ version = {attr = "gdex.version.__version__"}
 exclude = ["tests"]
 
 [tool.setuptools.package-data]
-"gdex" = ["de_whitelist.txt", "py.typed", "VulGer.csv"]
+"gdex" = ["de_whitelist.txt", "py.typed", "VulGer.csv", "Vulger_additions.txt"]

@@ -316,13 +316,11 @@ with _de_vulger_file.open(encoding="utf-8") as vulger:
             continue
         _de_vulger_blacklist.add(word)
 
-_de_vulger_additions_file = (
-    Path(__file__) / ".." / "additions_to_VulGer.txt"
-).resolve()
-if _de_vulger_additions_file.is_file():
-    _de_vulger_blacklist.update(
-        _de_vulger_additions_file.read_text(encoding="utf-8").splitlines()
-    )
+_de_vulger_additions_file = (Path(__file__) / ".." / "VulGer_additions.txt").resolve()
+_de_vulger_blacklist.update(
+    _de_vulger_additions_file.read_text(encoding="utf-8").splitlines()
+)
+
 
 de_core = SentenceScorer(
     has_finite_verb_and_subject=_de_has_finite_verb_and_subject,
