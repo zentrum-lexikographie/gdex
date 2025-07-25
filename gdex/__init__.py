@@ -204,30 +204,40 @@ def _de_is_misparsed(sent: Span) -> bool:
     return False
 
 
-_DE_SPACE_DEIXIS_TERMS = {
+# spatial/directional and temporal deixis terms
+_DE_SPACE_TIME_DEIXIS_TERMS = {
     "hier",
     "dort",
-    "über",
-    "da",
-    "vor",
-    "hinter",
-    "links",
-    "von",
-    "rechts",
-    "oben",
-    "unten",
+    "dorthin",
+    "da",  # not if SCONJ
+    "dahin",
+    "jetzt",
+    "gestern",
+    "daraufhin",
+    "bald",
+    "anschließend",
+    "damals",
+    "einst",
+    "kürzlich",
+    "neulich",
 }
 
-_DE_TIME_DEIXIS_TERMS = {
-    "jetzt",
+# additional deictic expressions — to be penalized only if token.is_sent_start
+_DE_DEIXIS_TERMS_AT_START = {
+    "später",
+    "spätere",
     "heute",
-    "gestern",
+    "vorgestern",
     "morgen",
+    "übermorgen",
     "dann",
-    "damals",
-    "bald",
-    "kürzlich",
+    "danach",
+    "hinterher",
+    "deshalb",  # causal
+    "deswegen",  # causal
+    "damit",  # instrumental; not if SCONJ
 }
+# reference: https://grammis.ids-mannheim.de/terminologie/717
 
 _DE_PERSON_DEIXIS_PRON_TYPES = {"Prs", "Dem", "Ind", "Neg", "Tot"}
 
@@ -238,9 +248,11 @@ def _de_is_deixis(token: Token) -> bool:
         and token.morph.get("PronType", [""])[0] in _DE_PERSON_DEIXIS_PRON_TYPES
     ):
         return True
-    if token.lemma_.lower() in _DE_SPACE_DEIXIS_TERMS:
+    if token.pos_ == "SCONJ":
+        return False
+    if token.text.lower() in _DE_SPACE_TIME_DEIXIS_TERMS:
         return True
-    if token.lemma_.lower() in _DE_TIME_DEIXIS_TERMS:
+    if token.is_sent_start and token.text.lower() in _DE_DEIXIS_TERMS_AT_START:
         return True
     return False
 
@@ -273,11 +285,12 @@ def _de_hdt_hit_in_subordinate_clause(sent: Span) -> bool:
         if token.dep_ in _DE_HDT_HYPO_DEPS:
             subtree_indices = {t.i for t in token.subtree}
             if sent[0].i in subtree_indices:
-                continue  # exception, because prominent placement seems likely
+                # exempt from this penalty, as a prominent placement is likely
+                continue
             subclause_indices.update(subtree_indices)
     if hit_indices.issubset(subclause_indices):
         return True
-    return False  # at least one hit in main clause
+    return False  # at least one hit in main clause or in exempted sub. clause
 
 
 _QWERTZ_DE = set(
@@ -302,6 +315,12 @@ with _de_vulger_file.open(encoding="utf-8") as vulger:
         if float(score) > 0:
             continue
         _de_vulger_blacklist.add(word)
+
+_de_vulger_additions_file = (Path(__file__) / ".." / "VulGer_additions.txt").resolve()
+_de_vulger_blacklist.update(
+    _de_vulger_additions_file.read_text(encoding="utf-8").splitlines()
+)
+
 
 de_core = SentenceScorer(
     has_finite_verb_and_subject=_de_has_finite_verb_and_subject,

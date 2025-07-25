@@ -158,6 +158,7 @@ def test_optimal_interval():
 
 def test_deixis():
     factor_method = gdex.SentenceScorer.factor_deixis
-    assert_penalty(factor_method, "Hier ist es schlecht!")
-    assert_penalty(factor_method, "Unten und oben ist es auch schlecht!")
     assert_penalty(factor_method, "Jetzt bitte nicht!")
+    assert_penalty(factor_method, "Hier ist ein Beispiel für Lokaldeixis.")
+    assert_penalty(factor_method, "Dann wieder eins für Temporaldeixis.")
+    assert_penalty(factor_method, "Sie sah ihm seine Verwunderung an.")
