@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.4.1...v1.5.0) (2025-07-25)
+
+
+### Features
+
+* Extend _de_whitelist and _de_vulger_blacklist ([0d4b662](https://github.com/zentrum-lexikographie/gdex/commit/0d4b662ed9a5b72334a29fe7b0fec9b4e3badde4))
+* Modify _de_is_deixis, revise default terms ([6fd7612](https://github.com/zentrum-lexikographie/gdex/commit/6fd7612559b953348a29eff1ab303bbdc19b1fee))
+
 ## [1.4.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.4.0...v1.4.1) (2025-07-03)
 
 
