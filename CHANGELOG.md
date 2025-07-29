@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.5.0...v1.5.1) (2025-07-29)
+
+
+### Dependencies
+
+* prepare v1.5.1 ([5d9d396](https://github.com/zentrum-lexikographie/gdex/commit/5d9d39602a8b941979378ed3456f786d1040cd98))
+
 ## [1.5.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.4.1...v1.5.0) (2025-07-25)
 
 
