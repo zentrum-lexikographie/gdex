@@ -1,6 +1,6 @@
 cff-version: "1.2.0"
 title: "Good Dictionary Examples – A Rule-based Sentence Scoring Algorithm Implemented in Python"
-version: 1.4.1
+version: 1.5.1
 license: "Apache-2.0"
 type: software
 abstract: "Python package providing a GDEX-based algorithm for evaluating sentences with regard to their suitability as good examples in dictionaries"
