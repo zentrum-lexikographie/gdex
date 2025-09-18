@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.2](https://github.com/zentrum-lexikographie/gdex/compare/v1.5.1...v1.5.2) (2025-09-18)
+
+
+### Bug Fixes
+
+* correct typo in package-data list ([3580ef2](https://github.com/zentrum-lexikographie/gdex/commit/3580ef2b95bcbbdb7c86c55afaab657998dc6250))
+
+
+### Dependencies
+
+* prepare v1.5.2 ([7441d8f](https://github.com/zentrum-lexikographie/gdex/commit/7441d8f76604afde9ebd492c88cef16e461e7f79))
+
 ## [1.5.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.5.0...v1.5.1) (2025-07-29)
 
 
