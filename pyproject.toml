@@ -24,7 +24,7 @@ classifiers = [
 requires-python = ">=3.12"
 dynamic = ["readme", "version"]
 dependencies = [
-    "spacy-models @ git+https://github.com/zentrum-lexikographie/spacy-models@v2.2.2"
+    "spacy-models @ git+https://github.com/zentrum-lexikographie/spacy-models@v2.3.0"
 ]
 
 [project.optional-dependencies]
