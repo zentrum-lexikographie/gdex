@@ -36,7 +36,7 @@ Among the gradual criteria are
 `gdex` can be installed as a package from its GitHub source repository:
 
 ```sh
-pip install git+https://github.com/zentrum-lexikographie/gdex.git@v1.5.2
+pip install git+https://github.com/zentrum-lexikographie/gdex.git@v1.6.0
 ```
 
 For development, clone it from GitHub and install it locally, including optional dependencies:
