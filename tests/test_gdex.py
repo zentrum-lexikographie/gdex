@@ -152,8 +152,8 @@ def test_rarelemmas():
 def test_optimal_interval():
     factor_method = gdex.SentenceScorer.factor_optimal_interval
     assert_penalty(factor_method, "Kurz ist doof!")
-    assert_penalty(factor_method, "Lang ist auch doof, " * 5 + ", wirklich!")
-    assert_penalty(factor_method, "Lang ist auch doof, " * 10 + ", ehrlich!")
+    assert_penalty(factor_method, "Lang ist auch doof, " * 5 + " wirklich!")
+    assert_penalty(factor_method, "Lang ist auch doof, " * 10 + " ehrlich!")
 
 
 def test_deixis():
