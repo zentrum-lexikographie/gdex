@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.5.2...v1.6.0) (2025-09-26)
+
+
+### Features
+
+* Update spacy-models to v2.3.0 (Python v3.13 compatibility) ([8de67f0](https://github.com/zentrum-lexikographie/gdex/commit/8de67f0356ffd8b1c8901e4fd437cfc4b1a37808))
+
+
+### Dependencies
+
+* prepare v1.6.0 ([5a6bfb4](https://github.com/zentrum-lexikographie/gdex/commit/5a6bfb472eda161e47c2fa8690ac4caf22a8cca5))
+
 ## [1.5.2](https://github.com/zentrum-lexikographie/gdex/compare/v1.5.1...v1.5.2) (2025-09-18)
 
 
