@@ -1,7 +1,5 @@
-import subprocess
-
 import spacy
-import zdl_spacy
+import spacy.cli.download
 
 import gdex
 
@@ -11,12 +9,12 @@ def load_de_core():
     try:
         return spacy.load(model)
     except OSError:
-        subprocess.check_call(["python", "-m", "spacy", "download", model])
+        spacy.cli.download(model)
         return spacy.load(model)
 
 
 de_core_nlp = load_de_core()
-de_hdt_nlp = zdl_spacy.load()
+de_hdt_nlp = spacy.load("de_zdl_lg")
 
 
 def scores(s):
@@ -76,8 +74,8 @@ def test_hypotaxis_hdt():
         (
             "Pinguine",
             (
-                "Alle Pinguine sind flugunfähig, wobei nicht "
-                "alle flugunfähigen Vögel Pinguine sind."
+                "Alle Pinguine sind flugunfähig, aber nicht alle Vögel, "
+                "die flugunfähig sind, sind Pinguine."
             ),
         ),
     ]
