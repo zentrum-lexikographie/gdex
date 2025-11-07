@@ -24,11 +24,12 @@ classifiers = [
 requires-python = ">=3.12"
 dynamic = ["readme", "version"]
 dependencies = [
-    "spacy-models @ git+https://github.com/zentrum-lexikographie/spacy-models@v2.3.0"
+    "spacy"
 ]
 
 [project.optional-dependencies]
 dev = [
+    "de_zdl_lg @ https://repo.zdl.org/repository/pypi/packages/de-zdl-lg/3.0.0/de_zdl_lg-3.0.0-py3-none-any.whl",
     "coverage",
     "flake8",
     "flake8-bugbear",
