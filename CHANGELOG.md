@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.6.0...v1.7.0) (2025-11-07)
+
+
+### Features
+
+* Reduce dependency on custom spaCy models ([162dd79](https://github.com/zentrum-lexikographie/gdex/commit/162dd796798b684da3ad55177fa2c02b9060eed7))
+
 ## [1.6.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.5.2...v1.6.0) (2025-09-26)
 
 
