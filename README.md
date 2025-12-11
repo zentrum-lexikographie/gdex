@@ -42,7 +42,7 @@ pip install git+https://github.com/zentrum-lexikographie/gdex.git@v1.6.0
 For development, clone it from GitHub and install it locally, including optional dependencies:
 
 ``` sh
-pip install -e .[dev]
+pip install -e .[dev] --extra-index-url https://gitup.uni-potsdam.de/api/v4/projects/21461/packages/pypi/simple
 ```
 
 ## Usage
