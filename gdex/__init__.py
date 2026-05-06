@@ -174,7 +174,7 @@ def _de_has_finite_verb_and_subject(sent: Span) -> bool:
             ) and not finite_verb.tag_.endswith("FIN"):
                 continue
             for subject in (*finite_verb.children, *root.children):
-                if subject.dep_ in {"sb", "nsubj"} and subject.pos_ in {
+                if subject.dep_ in {"sb", "nsubj", "nsubj:pass"} and subject.pos_ in {
                     "NOUN",
                     "PROPN",
                     "PRON",

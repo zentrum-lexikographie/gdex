@@ -121,6 +121,18 @@ def test_finite_verb_and_subject():
     assert_knockout("Über uns.")
 
 
+def test_passive_subject():
+    sent_scores = [
+        s._.gdex
+        for doc in scores(
+            "Der Test wird jetzt durchgeführt. Das Häuser wurden frisch gestrichen."
+        )
+        for s in doc.sents
+    ]
+    for s in sent_scores:
+        assert s >= 0.5
+
+
 def test_rarechars():
     factor_method = gdex.SentenceScorer.factor_rarechars
     assert_penalty(factor_method, "Für Zeichen wie + & € gibt es Punktabzug.")
