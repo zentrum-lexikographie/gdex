@@ -36,7 +36,7 @@ Among the gradual criteria are
 `gdex` can be installed as a package from its GitHub source repository:
 
 ```sh
-pip install git+https://github.com/zentrum-lexikographie/gdex.git@v1.6.0
+pip install git+https://github.com/zentrum-lexikographie/gdex.git
 ```
 
 For development, clone it from GitHub and install it locally, including optional dependencies:
@@ -47,11 +47,15 @@ pip install -e .[dev] --extra-index-url https://gitup.uni-potsdam.de/api/v4/proj
 
 ## Usage
 
+Install a SpaCy model, e.g. `de_zdl_lg` with:
+```sh
+pip install de-zdl-lg --index-url https://gitup.uni-potsdam.de/api/v4/projects/21461/packages/pypi/simple
+```
 
 ``` python-console
->>> import zdl_spacy
+>>> import spacy
 >>> import gdex
->>> nlp = zdl_spacy.load()
+>>> nlp = spacy.load("de_zdl_lg")
 >>> [s._.gdex for s in gdex.de_hdt(nlp("Achtung! Das ist ein toller Test.")).sents]
 [0.0, 0.5968749999999999]
 ```
