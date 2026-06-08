@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.7.1](https://github.com/zentrum-lexikographie/gdex/compare/v1.7.0...v1.7.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* passive subject with UD-based dep. annotation now counted as valid subject ([#24](https://github.com/zentrum-lexikographie/gdex/issues/24)) ([e7abf85](https://github.com/zentrum-lexikographie/gdex/commit/e7abf855679233c6eca1ea0a0b5ede5e5214e497))
+* Use custom package registry for spaCy test model ([5c6ff8c](https://github.com/zentrum-lexikographie/gdex/commit/5c6ff8cea298e6b18b843c6b746aeafeda5e9b65))
+
+
+### Documentation
+
+* update installation instruction and usage example ([#23](https://github.com/zentrum-lexikographie/gdex/issues/23)) ([7a66faa](https://github.com/zentrum-lexikographie/gdex/commit/7a66faac0d4a1ac847a16dce54b04f3694662e64))
+
 ## [1.7.0](https://github.com/zentrum-lexikographie/gdex/compare/v1.6.0...v1.7.0) (2025-11-07)
 
 
